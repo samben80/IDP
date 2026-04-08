@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BNI Ambassadeur — CASA IMPULSE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --gold:#C9A84C;--gold-light:#F0D285;--gold-dark:#8C6A1E;
+  --navy:#0D1B2A;--navy-mid:#162333;--navy-light:#1E3148;
+  --surface:#1A2B3C;--surface2:#223344;
+  --white:#F5F0E8;--text:#D4C9B0;
+  --green:#2ECC71;--red:#E74C3C;--orange:#F39C12;--blue:#4A9EBF;
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+  --tr:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);min-height:100vh;overflow-x:hidden}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,var(--navy-mid),var(--navy-light));border-bottom:1px solid rgba(201,168,76,.2);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--navy);box-shadow:0 2px 10px rgba(201,168,76,.4)}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--white)}
+.topbar-sub{font-size:11px;color:var(--gold);font-weight:500}
+.btn-import{background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:10px;padding:8px 12px;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:600;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(201,168,76,.3);transition:var(--tr)}
+.btn-import:active{transform:scale(.96)}
+#fileInput{display:none}
+
+/* MONTH SELECTOR BAR */
+.month-bar{background:var(--navy-mid);border-bottom:1px solid rgba(201,168,76,.1);padding:8px 14px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.month-bar::-webkit-scrollbar{display:none}
+.month-chip{flex-shrink:0;padding:5px 14px;border-radius:20px;border:1px solid rgba(201,168,76,.2);background:transparent;color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:var(--tr);font-family:'DM Sans',sans-serif;white-space:nowrap}
+.month-chip.active{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
+.month-bar-label{font-size:11px;color:var(--text);opacity:.6;flex-shrink:0}
+
+/* NAV TABS */
+.nav-tabs{display:flex;background:var(--navy-mid);border-bottom:1px solid rgba(201,168,76,.1)}
+.nav-tab{flex:1;padding:11px 6px;border:none;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:var(--tr);border-bottom:2px solid transparent}
+.nav-tab .ti{font-size:17px}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,168,76,.05)}
+
+/* PAGES */
+.page{display:none;padding:14px;padding-bottom:80px}
+.page.active{display:block}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-input{width:100%;background:var(--surface);border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);padding:11px 42px 11px 14px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:var(--tr)}
+.search-input::placeholder{color:rgba(212,201,176,.4)}
+.search-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.si{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--gold);opacity:.6}
+
+/* FILTER CHIPS */
+.filter-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:3px}
+.filter-row::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:5px 13px;border-radius:20px;border:1px solid rgba(201,168,76,.2);background:transparent;color:var(--text);font-size:12px;font-weight:500;cursor:pointer;transition:var(--tr);font-family:'DM Sans',sans-serif}
+.chip.active{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600}
+
+/* MEMBER CARD */
+.members-list{display:flex;flex-direction:column;gap:9px}
+.member-card{background:var(--surface);border:1px solid rgba(201,168,76,.1);border-radius:var(--radius);padding:13px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:11px}
+.member-card:active{transform:scale(.98);background:var(--surface2)}
+.member-card:hover{border-color:rgba(201,168,76,.3)}
+.m-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;flex-shrink:0;color:var(--navy)}
+.m-info{flex:1;min-width:0}
+.m-name{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-sub{font-size:11px;color:var(--gold);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-alert{font-size:11px;color:var(--red);margin-top:2px}
+.m-score{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.s-num{font-family:'Syne',sans-serif;font-weight:800;font-size:22px}
+.s-trend{font-size:11px;font-weight:600;display:flex;align-items:center;gap:2px}
+/* BNI score colors: <30 gray | 30-49 red | 50-69 orange | >=70 green */
+.cbni-gray{color:#9E9E9E}.cbni-red{color:#E53935}.cbni-orange{color:#F39C12}.cbni-green{color:#27AE60}
+.tup{color:var(--green)}.tdown{color:var(--red)}.tflat{color:var(--text)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex;align-items:flex-end}
+.modal{width:100%;max-height:92vh;background:var(--navy-mid);border-radius:24px 24px 0 0;overflow-y:auto;animation:slideUp .3s cubic-bezier(.4,0,.2,1);border-top:1px solid rgba(201,168,76,.2)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:rgba(201,168,76,.3);border-radius:2px;margin:12px auto 0}
+.modal-hdr{padding:14px 18px;display:flex;align-items:center;gap:13px;border-bottom:1px solid rgba(201,168,76,.1)}
+.modal-avatar{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:19px;color:var(--navy);flex-shrink:0}
+.modal-close{margin-left:auto;background:rgba(201,168,76,.1);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:17px;cursor:pointer;flex-shrink:0;transition:var(--tr)}
+.modal-body{padding:14px 18px}
+
+/* SCORE EVOLUTION MINI CHART */
+.evo-chart{display:flex;align-items:flex-end;gap:4px;height:40px;margin-bottom:4px}
+.evo-bar{flex:1;border-radius:3px 3px 0 0;transition:height .4s}
+.evo-labels{display:flex;gap:4px;margin-bottom:12px}
+.evo-label{flex:1;font-size:9px;color:var(--text);text-align:center;opacity:.7}
+
+/* Score banner */
+.score-banner{background:var(--surface);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:14px;margin-bottom:14px;border:1px solid rgba(201,168,76,.15)}
+.score-big{font-family:'Syne',sans-serif;font-weight:800;font-size:46px;line-height:1}
+.score-info{flex:1}
+.score-label{font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px}
+.score-evol{font-size:20px;font-weight:700;display:flex;align-items:center;gap:4px;margin-top:4px}
+
+/* Indicators */
+.ind-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.ind-grid{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.ind-row{background:var(--surface);border-radius:var(--radius-sm);padding:11px 13px;display:flex;align-items:center;gap:11px;border:1px solid transparent;transition:var(--tr)}
+.ind-row.alert{border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.05)}
+.ind-row.warn{border-color:rgba(243,156,18,.3);background:rgba(243,156,18,.05)}
+.ind-icon{font-size:21px;width:34px;text-align:center;flex-shrink:0}
+.ind-info{flex:1;min-width:0}
+.ind-name{font-size:12px;color:var(--text);font-weight:500}
+.ind-val{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-top:2px}
+.ind-prev{font-size:10px;color:var(--text);opacity:.7;margin-top:1px}
+.ind-badge{flex-shrink:0;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-alert{background:rgba(231,76,60,.2);color:var(--red)}
+.b-warn{background:rgba(243,156,18,.2);color:var(--orange)}
+.b-ok{background:rgba(46,204,113,.15);color:var(--green)}
+
+/* Alert box */
+.alert-box{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:14px}
+.ab-title{font-size:12px;font-weight:600;color:var(--red);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.ab-item{font-size:12px;color:var(--text);padding:3px 0;display:flex;align-items:flex-start;gap:7px}
+.ab-item::before{content:"→";color:var(--red);flex-shrink:0}
+
+/* CTAs */
+.btn-entretien{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius);padding:13px;color:var(--navy);font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 20px rgba(201,168,76,.3);transition:var(--tr);margin-bottom:10px}
+.btn-entretien:active{transform:scale(.97)}
+.btn-secondary{width:100%;background:var(--surface);border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);padding:11px;color:var(--gold);font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:var(--tr);margin-bottom:18px}
+.btn-secondary:active{background:var(--surface2)}
+
+/* FORM PAGE */
+.form-page{display:none;position:fixed;inset:0;z-index:300;background:var(--navy);overflow-y:auto;animation:slideIn .3s cubic-bezier(.4,0,.2,1)}
+.form-page.open{display:block}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.form-hdr{background:var(--navy-mid);border-bottom:1px solid rgba(201,168,76,.2);padding:13px 14px;display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:10}
+.btn-back{background:rgba(201,168,76,.1);border:none;border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:19px;cursor:pointer;flex-shrink:0}
+.form-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px}
+.form-sub{font-size:12px;color:var(--gold)}
+.form-body{padding:14px;padding-bottom:90px}
+.fsec{margin-bottom:22px}
+.fsec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.fg{margin-bottom:12px}
+.fl{font-size:12px;color:var(--text);font-weight:500;margin-bottom:5px;display:block}
+.fi,.fta,.fse{width:100%;background:var(--surface);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius-sm);padding:10px 13px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:var(--tr)}
+.fi:focus,.fta:focus,.fse:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+.fta{resize:vertical;min-height:75px;line-height:1.5}
+.fse option{background:var(--navy-mid)}
+.cb-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.cb-item{background:var(--surface);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius-sm);padding:9px 11px;cursor:pointer;transition:var(--tr);display:flex;align-items:center;gap:7px}
+.cb-item.checked{background:rgba(201,168,76,.12);border-color:var(--gold)}
+.cb-item input[type=checkbox]{display:none}
+.cb-check{width:17px;height:17px;border-radius:5px;border:1.5px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--tr)}
+.cb-item.checked .cb-check{background:var(--gold);border-color:var(--gold)}
+.cb-check::after{content:'✓';font-size:10px;color:var(--navy);font-weight:700;display:none}
+.cb-item.checked .cb-check::after{display:block}
+.cb-label{font-size:12px;color:var(--text);font-weight:500}
+.cb-item.checked .cb-label{color:var(--gold)}
+.eng-list{display:flex;flex-direction:column;gap:7px}
+.eng-item{background:var(--surface);border-radius:var(--radius-sm);padding:11px 13px;border-left:3px solid var(--gold);display:flex;align-items:flex-start;gap:9px}
+.eng-del{background:none;border:none;color:rgba(231,76,60,.6);font-size:17px;cursor:pointer;flex-shrink:0;padding:0;margin-top:1px}
+.eng-text{font-size:13px;color:var(--text);line-height:1.4}
+.btn-add-eng{width:100%;background:rgba(201,168,76,.08);border:1px dashed rgba(201,168,76,.3);border-radius:var(--radius-sm);padding:9px;color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;margin-top:7px;transition:var(--tr)}
+.btn-add-eng:active{background:rgba(201,168,76,.15)}
+.eng-inp-row{display:flex;gap:7px;margin-top:7px}
+.eng-inp{flex:1}
+.btn-eng-ok{background:var(--gold);border:none;border-radius:var(--radius-sm);padding:0 13px;color:var(--navy);font-weight:700;font-size:13px;cursor:pointer}
+.btn-submit{position:fixed;bottom:18px;left:14px;right:14px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius);padding:15px;color:var(--navy);font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 24px rgba(201,168,76,.4);display:flex;align-items:center;justify-content:center;gap:7px;transition:var(--tr)}
+.btn-submit:active{transform:scale(.97)}
+
+/* HISTORY */
+.rpt-card{background:var(--surface);border:1px solid rgba(201,168,76,.1);border-radius:var(--radius);padding:13px;margin-bottom:10px;cursor:pointer;transition:var(--tr)}
+.rpt-card:active{background:var(--surface2)}
+.rpt-hdr{display:flex;align-items:flex-start;gap:11px;margin-bottom:9px}
+.rpt-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--navy);flex-shrink:0}
+.rpt-name{font-family:'Syne',sans-serif;font-weight:600;font-size:13px}
+.rpt-date{font-size:11px;color:var(--text);margin-top:2px}
+.rpt-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.rpt-tag{padding:3px 9px;border-radius:12px;font-size:11px;font-weight:500;background:rgba(201,168,76,.1);color:var(--gold);border:1px solid rgba(201,168,76,.2)}
+.rpt-engs{margin-top:7px;border-top:1px solid rgba(201,168,76,.1);padding-top:7px}
+.rpt-eng{font-size:12px;color:var(--text);padding:2px 0;display:flex;align-items:flex-start;gap:5px}
+.rpt-eng::before{content:"✅";font-size:10px;flex-shrink:0}
+
+/* DASHBOARD */
+.dash-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.stat-card{background:var(--surface);border:1px solid rgba(201,168,76,.1);border-radius:var(--radius);padding:13px;text-align:center}
+.stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--gold)}
+.stat-lbl{font-size:11px;color:var(--text);margin-top:3px}
+.sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--gold);margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.divider{height:1px;background:rgba(201,168,76,.08);margin:18px 0}
+.bar-row{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bar-lbl{font-size:11px;color:var(--text);width:76px;flex-shrink:0}
+.bar-track{flex:1;height:8px;background:rgba(201,168,76,.1);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* REPORT DETAIL */
+.rpt-detail{display:none;position:fixed;inset:0;z-index:400;background:var(--navy);overflow-y:auto}
+.rpt-detail.open{display:block}
+
+/* TOAST */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:white;padding:11px 22px;border-radius:100px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(46,204,113,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+
+/* EMPTY */
+.empty{text-align:center;padding:36px 18px}
+.empty-icon{font-size:44px;margin-bottom:11px}
+.empty-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--white);margin-bottom:7px}
+.empty-sub{font-size:13px;color:var(--text);line-height:1.5}
+
+/* renewal */
+.ren-late{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600;background:rgba(231,76,60,.2);color:var(--red)}
+.ren-ok{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600;background:rgba(243,156,18,.15);color:var(--orange)}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,var(--navy) 0%,#0a1520 60%,#0f1e2e 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;}
+#loginScreen.hidden{display:none}
+.login-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:20px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:var(--navy);box-shadow:0 8px 32px rgba(201,168,76,.4);margin-bottom:20px;}
+.login-title{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--white);text-align:center;margin-bottom:6px;}
+.login-sub{font-size:13px;color:var(--gold);text-align:center;margin-bottom:36px;letter-spacing:.5px;}
+.login-box{width:100%;max-width:340px;background:var(--surface);border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);padding:28px 24px;box-shadow:0 16px 48px rgba(0,0,0,.4);}
+.login-label{font-size:12px;color:var(--text);font-weight:600;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.8px;}
+.login-input{width:100%;background:var(--navy-mid);border:1px solid rgba(201,168,76,.2);border-radius:var(--radius-sm);padding:13px 14px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:var(--tr);margin-bottom:16px;}
+.login-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.15);}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:var(--radius-sm);padding:14px;color:var(--navy);font-family:'Syne',sans-serif;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,.35);transition:var(--tr);margin-top:4px;}
+.login-btn:active{transform:scale(.97);}
+.login-err{color:var(--red);font-size:13px;text-align:center;margin-top:12px;min-height:20px;font-weight:500;}
+.login-footer{margin-top:24px;font-size:11px;color:rgba(212,201,176,.4);text-align:center;}
+.app-hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ======== LOGIN SCREEN ======== -->
+<div id="loginScreen">
+  <div class="login-logo">BNI</div>
+  <div class="login-title">Ambassadeur</div>
+  <div class="login-sub">CASA IMPULSE · MC-03</div>
+  <div class="login-box">
+    <label class="login-label">Identifiant</label>
+    <input class="login-input" id="loginUser" type="text" placeholder="Votre identifiant" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    <label class="login-label">Mot de passe</label>
+    <input class="login-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Se connecter</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+  <div class="login-footer">BNI CASA IMPULSE MC-03 · Accès sécurisé</div>
+</div>
+
+<!-- ======== APP (hidden until login) ======== -->
+<div id="appShell" class="app-hidden">
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon">BNI</div>
+    <div>
+      <div class="topbar-title">Ambassadeur</div>
+      <div class="topbar-sub">CASA IMPULSE · MC-03</div>
+    </div>
+  </div>
+  <label class="btn-import" for="fileInput">📂 Importer</label>
+  <input type="file" id="fileInput" accept=".xlsx,.xls">
+  <button onclick="doLogout()" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:7px 10px;color:var(--gold);font-size:12px;cursor:pointer;margin-left:4px;" title="Déconnexion">🚪</button>
+</div>
+
+<!-- MONTH BAR -->
+<div class="month-bar">
+  <span class="month-bar-label">Mois :</span>
+  <div id="monthChips"></div>
+</div>
+
+<!-- NAV -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showPage('membres')" id="tab-membres"><span class="ti">👥</span>Membres</button>
+  <button class="nav-tab" onclick="showPage('dashboard')" id="tab-dashboard"><span class="ti">📊</span>Tableau</button>
+  <button class="nav-tab" onclick="showPage('evolution')" id="tab-evolution"><span class="ti">📈</span>Évolution</button>
+  <button class="nav-tab" onclick="showPage('historique')" id="tab-historique"><span class="ti">📋</span>Entretiens</button>
+</div>
+
+<!-- PAGE MEMBRES -->
+<div class="page active" id="page-membres">
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" placeholder="Rechercher un membre..." oninput="filterMembers()">
+    <span class="si">🔍</span>
+  </div>
+  <div class="filter-row">
+    <button class="chip active" onclick="setFilter('all',this)">Tous</button>
+    <button class="chip" onclick="setFilter('alert',this)">⚠️ Alerte</button>
+    <button class="chip" onclick="setFilter('decline',this)">📉 En baisse</button>
+    <button class="chip" onclick="setFilter('renewal',this)">🔄 Retard</button>
+    <button class="chip" onclick="setFilter('top',this)">🟢 Zone verte</button>
+  </div>
+  <div class="members-list" id="membersList"></div>
+</div>
+
+<!-- PAGE DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div style="margin-bottom:14px;font-size:12px;color:var(--gold);font-weight:600;">📅 <span id="dashMonthLabel"></span></div>
+  <div class="dash-stats" id="dashStats"></div>
+  <div class="sec-title">📉 Membres nécessitant attention</div>
+  <div id="dashAlerts"></div>
+  <div class="divider"></div>
+  <div class="sec-title">📊 Distribution des scores</div>
+  <div id="dashDistrib"></div>
+  <div class="divider"></div>
+  <div class="sec-title">🏆 Top 10</div>
+  <div id="dashTop10"></div>
+</div>
+
+<!-- PAGE EVOLUTION -->
+<div class="page" id="page-evolution">
+  <div class="sec-title" style="margin-bottom:6px;">📈 Évolution du chapter</div>
+  <div style="font-size:12px;color:var(--text);margin-bottom:16px;">Répartition des membres par zone de score, mois par mois</div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;border-radius:3px;background:#27AE60;"></div><span style="font-size:12px;color:var(--text);">🟢 Vert (≥70)</span></div>
+    <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;border-radius:3px;background:#F39C12;"></div><span style="font-size:12px;color:var(--text);">🟡 Orange (50–69)</span></div>
+    <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;border-radius:3px;background:#E53935;"></div><span style="font-size:12px;color:var(--text);">🔴 Rouge (30–49)</span></div>
+    <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;border-radius:3px;background:#9E9E9E;"></div><span style="font-size:12px;color:var(--text);">⬜ Gris (&lt;30)</span></div>
+  </div>
+
+  <!-- SVG Chart -->
+  <div style="background:var(--surface);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:16px;margin-bottom:16px;overflow:hidden;">
+    <div style="font-size:11px;color:var(--text);margin-bottom:10px;font-weight:600;">Nombre de membres par zone</div>
+    <svg id="evoChartSVG" width="100%" viewBox="0 0 340 200" preserveAspectRatio="xMidYMid meet" style="display:block;overflow:visible;"></svg>
+    <div id="evoChartXLabels" style="display:flex;justify-content:space-around;margin-top:6px;padding:0 30px;"></div>
+  </div>
+
+  <!-- % Chart -->
+  <div style="background:var(--surface);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:16px;margin-bottom:16px;overflow:hidden;">
+    <div style="font-size:11px;color:var(--text);margin-bottom:10px;font-weight:600;">Pourcentage de membres par zone</div>
+    <svg id="evoPctSVG" width="100%" viewBox="0 0 340 200" preserveAspectRatio="xMidYMid meet" style="display:block;overflow:visible;"></svg>
+    <div id="evoPctXLabels" style="display:flex;justify-content:space-around;margin-top:6px;padding:0 30px;"></div>
+  </div>
+
+  <!-- Score moyen chart -->
+  <div style="background:var(--surface);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius);padding:16px;margin-bottom:16px;overflow:hidden;">
+    <div style="font-size:11px;color:var(--text);margin-bottom:10px;font-weight:600;">Score moyen du chapter</div>
+    <svg id="evoAvgSVG" width="100%" viewBox="0 0 340 200" preserveAspectRatio="xMidYMid meet" style="display:block;overflow:visible;"></svg>
+    <div id="evoAvgXLabels" style="display:flex;justify-content:space-around;margin-top:6px;padding:0 30px;"></div>
+  </div>
+
+  <!-- Table détail -->
+  <div class="sec-title">📋 Détail mensuel</div>
+  <div id="evoTable"></div>
+</div>
+
+<!-- PAGE HISTORIQUE -->
+<div class="page" id="page-historique">
+  <div class="search-wrap">
+    <input class="search-input" id="histSearch" placeholder="Rechercher..." oninput="filterHistory()">
+    <span class="si">🔍</span>
+  </div>
+  <div id="histList"></div>
+</div>
+
+<!-- MEMBER MODAL -->
+<div class="modal-overlay" id="memberModal" onclick="closeMemberModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr" id="modalHdr"></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- FORM PAGE -->
+<div class="form-page" id="formPage">
+  <div class="form-hdr">
+    <button class="btn-back" onclick="closeForm()">←</button>
+    <div><div class="form-title">Nouvel entretien</div><div class="form-sub" id="formMemberName"></div></div>
+  </div>
+  <div class="form-body">
+    <div class="fsec">
+      <div class="fsec-title">📅 Informations</div>
+      <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="entDate"></div>
+      <div class="fg"><label class="fl">Format</label>
+        <select class="fse" id="entLieu">
+          <option value="">Sélectionner...</option>
+          <option>En réunion BNI</option><option>Tête-à-tête en personne</option>
+          <option>Appel téléphonique</option><option>Visioconférence</option>
+          <option>Déjeuner</option><option>Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title">📌 Indicateurs abordés</div>
+      <div class="cb-grid" id="indicatorsChecks"></div>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title">💬 Notes</div>
+      <div class="fg"><label class="fl">Points discutés</label><textarea class="fta" id="entNotes" rows="4" placeholder="Résumé de la discussion..."></textarea></div>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title">✅ Engagements du membre</div>
+      <div class="eng-list" id="engagementList"></div>
+      <div class="eng-inp-row" id="engInputRow" style="display:none">
+        <input class="fi eng-inp" id="engInput" placeholder="Saisir l'engagement..." onkeydown="if(event.key==='Enter')addEngagement()">
+        <button class="btn-eng-ok" onclick="addEngagement()">+</button>
+      </div>
+      <button class="btn-add-eng" onclick="showEngInput()">+ Ajouter un engagement</button>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title">🎯 Suivi</div>
+      <div class="fg"><label class="fl">Progression depuis dernier entretien ?</label>
+        <select class="fse" id="entProgres">
+          <option value="">Sélectionner...</option>
+          <option value="oui">✅ Amélioration nette</option>
+          <option value="partiel">🟡 Partiellement</option>
+          <option value="non">❌ Pas de changement</option>
+          <option value="premier">🆕 Premier entretien</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Prochain entretien prévu</label><input type="date" class="fi" id="entNextDate"></div>
+    </div>
+  </div>
+  <button class="btn-submit" onclick="saveEntretien()">💾 Enregistrer</button>
+</div>
+
+<!-- REPORT DETAIL -->
+<div class="rpt-detail" id="rptDetail">
+  <div class="form-hdr">
+    <button class="btn-back" onclick="closeRptDetail()">←</button>
+    <div><div class="form-title">Détail entretien</div><div class="form-sub" id="rptDetailMember"></div></div>
+  </div>
+  <div style="padding:14px;padding-bottom:40px" id="rptDetailBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div><!-- end #appShell -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+
+// ============================================================
+// AUTHENTICATION
+// ============================================================
+// Pour changer les identifiants : modifiez les valeurs ci-dessous
+// Le mot de passe est stocké en hash SHA-256 pour plus de sécurité
+const USERS = {
+  'ambassadeur': 'b94d27b9934d3e08a52e52d7da7dabfac484efe04294e576e442f2e6e55e0b1c', // mdp: bni2026
+  'admin':       '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', // mdp: Admin2026!
+};
+// ⚠️ Pour générer un nouveau hash : ouvrez la console du navigateur et tapez :
+// crypto.subtle.digest('SHA-256', new TextEncoder().encode('votre_mdp')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin() {
+  const user = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.textContent = '';
+  if (!user || !pass) { errEl.textContent = 'Veuillez remplir tous les champs.'; return; }
+  const hash = await sha256(pass);
+  if (USERS[user] && USERS[user] === hash) {
+    sessionStorage.setItem('bni_auth', user);
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appShell').classList.remove('app-hidden');
+    initApp();
+  } else {
+    errEl.textContent = '❌ Identifiant ou mot de passe incorrect.';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+  }
+}
+
+function doLogout() {
+  if (!confirm('Voulez-vous vous déconnecter ?')) return;
+  sessionStorage.removeItem('bni_auth');
+  document.getElementById('appShell').classList.add('app-hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').textContent = '';
+}
+
+// Check if already logged in (same browser session)
+function checkAuth() {
+  const auth = sessionStorage.getItem('bni_auth');
+  if (auth && USERS[auth]) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appShell').classList.remove('app-hidden');
+    initApp();
+  }
+}
+
+// ============================================================
+// EMBEDDED DATA — Février et Mars 2026
+// ============================================================
+const BUILTIN_MONTHS = {
+  "Février 2026": [{"nom":"Dalila ENNACIRI (Coordinateur des Mentors)","absence":0.0,"eco_donnees":1.92,"reco_recues":0.38,"mpb":4231865.0,"invites":2.17,"tat":2.53,"score":100,"score_m1":85,"anciennete":2.8,"date_renouvellement":"01/03/2026 En Retard"},{"nom":"Najib JABRI","absence":0.0,"eco_donnees":4.21,"reco_recues":3.13,"mpb":1238073.0,"invites":1.98,"tat":4.33,"score":100,"score_m1":100,"anciennete":4.0,"date_renouvellement":"01/01/2026 En Retard"},{"nom":"Issam BENJELLOUN","absence":0.0,"eco_donnees":3.08,"reco_recues":6.0,"mpb":863350.0,"invites":1.44,"tat":3.25,"score":100,"score_m1":100,"anciennete":4.7,"date_renouvellement":"01/04/2023 En Retard"},{"nom":"Najlae EL MASLOUHI","absence":0.0,"eco_donnees":1.92,"reco_recues":0.63,"mpb":690935.0,"invites":1.44,"tat":2.17,"score":100,"score_m1":90,"anciennete":3.3,"date_renouvellement":""},{"nom":"Farid BENLAFDIL (Comité des Membres)","absence":0.0,"eco_donnees":2.83,"reco_recues":1.71,"mpb":6180234.0,"invites":0.9,"tat":2.35,"score":95,"score_m1":85,"anciennete":3.7,"date_renouvellement":"01/06/2026"},{"nom":"Brahim SEKKAT","absence":0.0,"eco_donnees":2.38,"reco_recues":0.88,"mpb":1731503.0,"invites":0.72,"tat":2.17,"score":95,"score_m1":95,"anciennete":1.9,"date_renouvellement":""},{"nom":"Kenza BELKHAYAT ZOUKARI (Coordinateur d'Éducation)","absence":1.0,"eco_donnees":4.46,"reco_recues":0.79,"mpb":1831177.0,"invites":0.9,"tat":6.31,"score":90,"score_m1":90,"anciennete":3.4,"date_renouvellement":"01/10/2024 En Retard"},{"nom":"Driss GUESSOUS (Secrétaire-Trésorier)","absence":2.0,"eco_donnees":1.71,"reco_recues":0.54,"mpb":643059.0,"invites":1.44,"tat":2.53,"score":90,"score_m1":95,"anciennete":4.8,"date_renouvellement":"01/05/2026"},{"nom":"Adil LAMNINI","absence":1.0,"eco_donnees":1.5,"reco_recues":0.33,"mpb":380484.0,"invites":0.9,"tat":7.04,"score":90,"score_m1":100,"anciennete":1.9,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Abdellatif BENNANI","absence":1.0,"eco_donnees":1.17,"reco_recues":0.63,"mpb":308141.0,"invites":0.72,"tat":3.79,"score":90,"score_m1":80,"anciennete":1.8,"date_renouvellement":"01/05/2026"},{"nom":"Hanaa FOULANI","absence":0.0,"eco_donnees":2.21,"reco_recues":0.17,"mpb":216755.0,"invites":0.9,"tat":3.79,"score":90,"score_m1":100,"anciennete":5.7,"date_renouvellement":"01/03/2025 En Retard"},{"nom":"Chama BARGACH (Coordinateur Réseaux Sociaux)","absence":0.0,"eco_donnees":1.29,"reco_recues":0.92,"mpb":132846.0,"invites":1.8,"tat":8.84,"score":90,"score_m1":85,"anciennete":0.8,"date_renouvellement":"01/05/2026"},{"nom":"Meriem SAHIAOUI (Comité des Membres)","absence":0.0,"eco_donnees":1.21,"reco_recues":1.21,"mpb":454732.0,"invites":0.18,"tat":5.41,"score":85,"score_m1":85,"anciennete":4.3,"date_renouvellement":"01/05/2026"},{"nom":"Kamal KANINE","absence":0.0,"eco_donnees":1.13,"reco_recues":0.71,"mpb":366037.0,"invites":0.36,"tat":2.89,"score":85,"score_m1":65,"anciennete":3.4,"date_renouvellement":"01/10/2025 En Retard"},{"nom":"Youssef HAMDOUCH","absence":1.0,"eco_donnees":2.75,"reco_recues":0.58,"mpb":340290.0,"invites":0.72,"tat":1.8,"score":85,"score_m1":85,"anciennete":1.2,"date_renouvellement":""},{"nom":"Abdelaziz HABIB","absence":0.0,"eco_donnees":0.79,"reco_recues":0.33,"mpb":300449.0,"invites":1.8,"tat":1.98,"score":85,"score_m1":90,"anciennete":2.7,"date_renouvellement":""},{"nom":"Nadia CHELLAOUI (Comité des Membres)","absence":1.0,"eco_donnees":3.71,"reco_recues":4.42,"mpb":143684.0,"invites":1.08,"tat":3.79,"score":85,"score_m1":75,"anciennete":4.7,"date_renouvellement":"01/07/2026"},{"nom":"Selma GUESSOUS","absence":1.0,"eco_donnees":1.63,"reco_recues":0.17,"mpb":137027.0,"invites":1.26,"tat":2.35,"score":85,"score_m1":80,"anciennete":4.7,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Ali ZIZI","absence":0.0,"eco_donnees":1.29,"reco_recues":4.71,"mpb":92380.0,"invites":1.8,"tat":2.71,"score":85,"score_m1":85,"anciennete":3.4,"date_renouvellement":""},{"nom":"Younes BELASRY","absence":0.0,"eco_donnees":1.21,"reco_recues":1.21,"mpb":50971.0,"invites":2.17,"tat":3.97,"score":85,"score_m1":85,"anciennete":5.3,"date_renouvellement":""},{"nom":"Sofia BLOT (Président)","absence":0.0,"eco_donnees":1.08,"reco_recues":1.25,"mpb":18650.0,"invites":1.26,"tat":4.33,"score":85,"score_m1":85,"anciennete":1.2,"date_renouvellement":""},{"nom":"Tareq BENSEDDIK","absence":0.0,"eco_donnees":1.08,"reco_recues":0.5,"mpb":17650.0,"invites":3.97,"tat":6.5,"score":85,"score_m1":85,"anciennete":0.2,"date_renouvellement":""},{"nom":"MEHDI KTIRI (Comité des Membres)","absence":1.0,"eco_donnees":2.13,"reco_recues":1.67,"mpb":937171.0,"invites":0.18,"tat":3.97,"score":80,"score_m1":80,"anciennete":3.4,"date_renouvellement":""},{"nom":"Imane AMRI","absence":3.0,"eco_donnees":2.79,"reco_recues":0.5,"mpb":912006.0,"invites":0.9,"tat":3.25,"score":80,"score_m1":80,"anciennete":4.7,"date_renouvellement":"01/06/2026"},{"nom":"Aïda BENNANI (Vice-Président)","absence":0.0,"eco_donnees":1.08,"reco_recues":0.67,"mpb":112521.0,"invites":2.17,"tat":1.26,"score":80,"score_m1":75,"anciennete":3.2,"date_renouvellement":""},{"nom":"Salma ABARRO (Comité des Membres)","absence":0.0,"eco_donnees":1.04,"reco_recues":1.42,"mpb":32995.0,"invites":0.9,"tat":3.79,"score":80,"score_m1":85,"anciennete":4.4,"date_renouvellement":""},{"nom":"Mohamed AMMOR","absence":2.0,"eco_donnees":1.13,"reco_recues":1.13,"mpb":1837762.0,"invites":0.36,"tat":7.76,"score":75,"score_m1":75,"anciennete":1.3,"date_renouvellement":""},{"nom":"Mohamed BOUCHOUARI (Responsable d'accueil)","absence":2.0,"eco_donnees":1.67,"reco_recues":1.17,"mpb":786550.0,"invites":0.0,"tat":4.51,"score":75,"score_m1":75,"anciennete":1.8,"date_renouvellement":"01/05/2026"},{"nom":"Reda BENSARI","absence":2.0,"eco_donnees":1.83,"reco_recues":4.5,"mpb":692847.0,"invites":0.0,"tat":2.71,"score":75,"score_m1":80,"anciennete":4.7,"date_renouvellement":""},{"nom":"Imane MAMANE","absence":2.0,"eco_donnees":1.33,"reco_recues":0.63,"mpb":416185.0,"invites":0.36,"tat":2.53,"score":75,"score_m1":70,"anciennete":1.9,"date_renouvellement":""},{"nom":"Zineb BELKHAYAT (Responsable d'accueil)","absence":2.0,"eco_donnees":2.04,"reco_recues":0.71,"mpb":392425.0,"invites":0.36,"tat":3.25,"score":75,"score_m1":75,"anciennete":1.0,"date_renouvellement":""},{"nom":"David SEBBAG","absence":1.0,"eco_donnees":1.21,"reco_recues":2.58,"mpb":176897.0,"invites":0.0,"tat":2.17,"score":75,"score_m1":75,"anciennete":1.7,"date_renouvellement":"01/07/2026"},{"nom":"Sahar SBAI (Coordinateur Réseaux Sociaux)","absence":0.0,"eco_donnees":0.68,"reco_recues":0.64,"mpb":4200.0,"invites":1.97,"tat":9.05,"score":75,"score_m1":70,"anciennete":0.5,"date_renouvellement":""},{"nom":"Youssef BENNANI","absence":3.0,"eco_donnees":2.21,"reco_recues":0.63,"mpb":3944089.0,"invites":0.54,"tat":1.98,"score":70,"score_m1":80,"anciennete":5.7,"date_renouvellement":""},{"nom":"Driss AMRAOUI (Responsable d'accueil)","absence":2.0,"eco_donnees":0.89,"reco_recues":0.58,"mpb":649750.0,"invites":0.46,"tat":4.1,"score":70,"score_m1":65,"anciennete":0.4,"date_renouvellement":""},{"nom":"Imad MOUJAHID","absence":1.0,"eco_donnees":0.75,"reco_recues":1.08,"mpb":285693.0,"invites":0.18,"tat":5.59,"score":70,"score_m1":60,"anciennete":1.2,"date_renouvellement":""},{"nom":"Yasmine SBIOUI","absence":1.0,"eco_donnees":1.67,"reco_recues":3.29,"mpb":140245.0,"invites":0.18,"tat":4.33,"score":70,"score_m1":75,"anciennete":2.9,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Salah eddine MORTAQI","absence":0.0,"eco_donnees":0.5,"reco_recues":4.75,"mpb":82098.0,"invites":1.98,"tat":2.53,"score":70,"score_m1":70,"anciennete":3.0,"date_renouvellement":""},{"nom":"Safaa GHALIBE","absence":1.0,"eco_donnees":1.83,"reco_recues":3.79,"mpb":52544.0,"invites":0.54,"tat":2.53,"score":70,"score_m1":65,"anciennete":2.6,"date_renouvellement":""},{"nom":"Soraya RHLID","absence":0.0,"eco_donnees":1.25,"reco_recues":0.92,"mpb":51310.0,"invites":0.36,"tat":6.5,"score":70,"score_m1":70,"anciennete":4.7,"date_renouvellement":"01/07/2023 En Retard"},{"nom":"Aziza RAMZI","absence":6.0,"eco_donnees":1.42,"reco_recues":0.38,"mpb":856358.0,"invites":0.0,"tat":1.62,"score":65,"score_m1":65,"anciennete":1.6,"date_renouvellement":""},{"nom":"Mahmoud SBIOUI","absence":3.0,"eco_donnees":0.96,"reco_recues":0.71,"mpb":367750.0,"invites":0.18,"tat":2.71,"score":65,"score_m1":65,"anciennete":2.7,"date_renouvellement":"01/06/2026"},{"nom":"Abdelmounaim RAHAL","absence":0.0,"eco_donnees":0.75,"reco_recues":0.25,"mpb":21194.0,"invites":0.54,"tat":3.43,"score":65,"score_m1":75,"anciennete":2.7,"date_renouvellement":"01/06/2026"},{"nom":"Omar MOUIZINA (Coordinateur événements)","absence":2.0,"eco_donnees":0.67,"reco_recues":0.92,"mpb":4800.0,"invites":1.08,"tat":6.5,"score":65,"score_m1":70,"anciennete":0.2,"date_renouvellement":""},{"nom":"Maryam LAGHRARI","absence":4.0,"eco_donnees":1.38,"reco_recues":1.75,"mpb":434584.0,"invites":0.0,"tat":1.44,"score":60,"score_m1":55,"anciennete":1.8,"date_renouvellement":"01/05/2026"},{"nom":"Hicham BENCHEKROUNE (Responsable d'accueil)","absence":0.0,"eco_donnees":0.92,"reco_recues":3.21,"mpb":95334.0,"invites":0.18,"tat":1.98,"score":60,"score_m1":65,"anciennete":4.7,"date_renouvellement":""},{"nom":"Anis BOUYAQINE","absence":3.0,"eco_donnees":1.63,"reco_recues":1.17,"mpb":91181.0,"invites":0.54,"tat":2.17,"score":60,"score_m1":70,"anciennete":5.7,"date_renouvellement":"01/02/2026 En Retard"},{"nom":"Karima LEBBAT","absence":2.0,"eco_donnees":1.08,"reco_recues":3.5,"mpb":88803.0,"invites":0.54,"tat":1.62,"score":60,"score_m1":55,"anciennete":3.9,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Houda FASLA TAHIRI","absence":2.0,"eco_donnees":2.21,"reco_recues":1.54,"mpb":80821.0,"invites":0.0,"tat":2.53,"score":60,"score_m1":60,"anciennete":2.3,"date_renouvellement":""},{"nom":"Romain VERDAVAINNE (Responsable d'accueil)","absence":0.0,"eco_donnees":0.79,"reco_recues":0.79,"mpb":64309.0,"invites":0.18,"tat":2.71,"score":60,"score_m1":65,"anciennete":2.2,"date_renouvellement":""},{"nom":"Nabil LARAKI","absence":0.0,"eco_donnees":0.13,"reco_recues":1.21,"mpb":10027.0,"invites":1.08,"tat":1.44,"score":60,"score_m1":65,"anciennete":1.7,"date_renouvellement":"01/07/2026"},{"nom":"Najwa BOUZOUBAA","absence":5.0,"eco_donnees":1.54,"reco_recues":0.79,"mpb":634567.0,"invites":0.36,"tat":0.9,"score":55,"score_m1":55,"anciennete":5.2,"date_renouvellement":""},{"nom":"Didier GAMBINO","absence":2.0,"eco_donnees":0.46,"reco_recues":0.67,"mpb":435060.0,"invites":0.36,"tat":1.8,"score":55,"score_m1":60,"anciennete":2.4,"date_renouvellement":""},{"nom":"Omar RAIS","absence":1.0,"eco_donnees":0.63,"reco_recues":0.58,"mpb":209941.0,"invites":0.18,"tat":1.62,"score":55,"score_m1":55,"anciennete":4.0,"date_renouvellement":""},{"nom":"Ilham IKBAL","absence":4.0,"eco_donnees":1.29,"reco_recues":0.21,"mpb":95213.0,"invites":0.36,"tat":2.35,"score":55,"score_m1":55,"anciennete":4.2,"date_renouvellement":"01/05/2026"},{"nom":"Louis CACCIUTTOLO","absence":0.0,"eco_donnees":0.17,"reco_recues":0.54,"mpb":12700.0,"invites":0.36,"tat":7.58,"score":55,"score_m1":55,"anciennete":0.5,"date_renouvellement":""},{"nom":"Yacine BENYASSINE","absence":3.0,"eco_donnees":0.42,"reco_recues":0.33,"mpb":11933.0,"invites":2.53,"tat":2.53,"score":55,"score_m1":75,"anciennete":0.2,"date_renouvellement":""},{"nom":"Ghizlane DARBANE (Responsable d'accueil)","absence":2.0,"eco_donnees":1.0,"reco_recues":0.5,"mpb":5892.0,"invites":0.0,"tat":1.62,"score":55,"score_m1":55,"anciennete":2.2,"date_renouvellement":""},{"nom":"Hamza LARAKI","absence":4.0,"eco_donnees":0.67,"reco_recues":0.75,"mpb":183053.0,"invites":0.18,"tat":1.98,"score":50,"score_m1":60,"anciennete":0.8,"date_renouvellement":"01/05/2026"},{"nom":"Hamza TAOUDI BENCHEKROUN","absence":0.0,"eco_donnees":0.5,"reco_recues":1.0,"mpb":112882.0,"invites":0.54,"tat":0.36,"score":50,"score_m1":50,"anciennete":2.4,"date_renouvellement":""},{"nom":"Wissam EL FAYAD","absence":5.0,"eco_donnees":0.92,"reco_recues":0.46,"mpb":82279.0,"invites":0.9,"tat":1.08,"score":50,"score_m1":50,"anciennete":2.4,"date_renouvellement":""},{"nom":"Ghita KADDAD","absence":0.0,"eco_donnees":0.54,"reco_recues":0.83,"mpb":81560.0,"invites":0.36,"tat":1.98,"score":50,"score_m1":50,"anciennete":2.7,"date_renouvellement":"01/06/2026"},{"nom":"Ahlam LAGHLID","absence":1.0,"eco_donnees":0.63,"reco_recues":0.79,"mpb":14102.0,"invites":0.36,"tat":5.41,"score":50,"score_m1":55,"anciennete":0.9,"date_renouvellement":""},{"nom":"Eddie LEBOURG","absence":1.0,"eco_donnees":0.5,"reco_recues":0.54,"mpb":12508.0,"invites":0.18,"tat":6.68,"score":50,"score_m1":50,"anciennete":0.8,"date_renouvellement":"01/05/2026"},{"nom":"Abderrahman DIOURI","absence":2.0,"eco_donnees":0.71,"reco_recues":1.0,"mpb":79836.0,"invites":0.0,"tat":1.98,"score":45,"score_m1":55,"anciennete":2.5,"date_renouvellement":""},{"nom":"Yassir BENSAID","absence":4.0,"eco_donnees":0.75,"reco_recues":1.0,"mpb":45868.0,"invites":0.0,"tat":2.89,"score":45,"score_m1":45,"anciennete":4.2,"date_renouvellement":""},{"nom":"Hicham BENNIS","absence":1.0,"eco_donnees":0.5,"reco_recues":1.13,"mpb":9225.0,"invites":0.0,"tat":1.8,"score":45,"score_m1":50,"anciennete":2.7,"date_renouvellement":"01/06/2026"},{"nom":"Ridaa LEFRIYEKH","absence":3.0,"eco_donnees":0.36,"reco_recues":0.57,"mpb":0.0,"invites":0.62,"tat":4.33,"score":45,"score_m1":45,"anciennete":0.2,"date_renouvellement":""},{"nom":"Younes BOUKOUMJIH","absence":2.0,"eco_donnees":0.71,"reco_recues":1.04,"mpb":93944.0,"invites":0.36,"tat":1.08,"score":40,"score_m1":45,"anciennete":3.3,"date_renouvellement":""},{"nom":"Mohamed Amine BOUKILI","absence":1.0,"eco_donnees":0.42,"reco_recues":0.21,"mpb":78830.0,"invites":0.36,"tat":0.9,"score":35,"score_m1":35,"anciennete":2.9,"date_renouvellement":""},{"nom":"Ismail SLAOUI","absence":4.0,"eco_donnees":0.13,"reco_recues":0.29,"mpb":0.0,"invites":0.0,"tat":1.8,"score":35,"score_m1":45,"anciennete":0.7,"date_renouvellement":"01/07/2026"},{"nom":"Nizar SKIREDJ","absence":2.0,"eco_donnees":0.42,"reco_recues":0.25,"mpb":59587.0,"invites":0.0,"tat":0.9,"score":30,"score_m1":40,"anciennete":1.2,"date_renouvellement":""},{"nom":"Younes BERRADA","absence":2.0,"eco_donnees":0.0,"reco_recues":0.09,"mpb":0.0,"invites":0.39,"tat":0.39,"score":30,"score_m1":35,"anciennete":0.2,"date_renouvellement":""},{"nom":"ALIDI MOHAMED YASSINE","absence":12.0,"eco_donnees":0.08,"reco_recues":0.04,"mpb":12684.0,"invites":0.18,"tat":0.54,"score":25,"score_m1":25,"anciennete":0.6,"date_renouvellement":""},{"nom":"Oussama SEFFAR","absence":7.0,"eco_donnees":0.21,"reco_recues":0.25,"mpb":3600.0,"invites":0.0,"tat":0.54,"score":25,"score_m1":30,"anciennete":2.7,"date_renouvellement":"01/06/2026"},{"nom":"Omar RAHIM","absence":5.0,"eco_donnees":0.07,"reco_recues":0.07,"mpb":0.0,"invites":0.0,"tat":0.87,"score":25,"score_m1":30,"anciennete":0.3,"date_renouvellement":""},{"nom":"Salim BENMLIH FATH","absence":8.0,"eco_donnees":0.29,"reco_recues":0.21,"mpb":0.0,"invites":0.0,"tat":0.0,"score":25,"score_m1":25,"anciennete":0.9,"date_renouvellement":"01/04/2026 En Retard"}],
+  "Mars 2026": [{"nom":"Najib JABRI","absence":0.0,"eco_donnees":4.0,"reco_recues":2.79,"mpb":1060613.0,"invites":1.26,"tat":3.79,"score":100,"score_m1":100,"anciennete":4.1,"date_renouvellement":"01/01/2026 En Retard"},{"nom":"Najlae EL MASLOUHI","absence":0.0,"eco_donnees":2.17,"reco_recues":0.58,"mpb":678271.0,"invites":1.44,"tat":2.35,"score":100,"score_m1":100,"anciennete":3.4,"date_renouvellement":""},{"nom":"Nadia CHELLAOUI (Comité des Membres)","absence":0.0,"eco_donnees":3.25,"reco_recues":4.29,"mpb":350104.0,"invites":1.26,"tat":4.33,"score":100,"score_m1":85,"anciennete":4.8,"date_renouvellement":"01/07/2026"},{"nom":"Chama BARGACH (Coordinateur Réseaux Sociaux)","absence":0.0,"eco_donnees":1.04,"reco_recues":0.96,"mpb":289562.0,"invites":1.44,"tat":8.12,"score":100,"score_m1":90,"anciennete":0.9,"date_renouvellement":"01/05/2026"},{"nom":"Farid BENLAFDIL (Comité des Membres)","absence":0.0,"eco_donnees":2.46,"reco_recues":1.63,"mpb":5689978.0,"invites":0.72,"tat":3.07,"score":95,"score_m1":95,"anciennete":3.8,"date_renouvellement":"01/06/2026"},{"nom":"Dalila ENNACIRI (Coordinateur des Mentors)","absence":0.0,"eco_donnees":1.96,"reco_recues":0.33,"mpb":4225856.0,"invites":1.98,"tat":1.98,"score":95,"score_m1":100,"anciennete":2.9,"date_renouvellement":"01/03/2026 En Retard"},{"nom":"Issam BENJELLOUN","absence":0.0,"eco_donnees":2.5,"reco_recues":5.92,"mpb":1047833.0,"invites":0.9,"tat":3.61,"score":95,"score_m1":100,"anciennete":4.8,"date_renouvellement":"01/04/2023 En Retard"},{"nom":"Kenza BELKHAYAT ZOUKARI (Coordinateur d'Éducation)","absence":1.0,"eco_donnees":4.0,"reco_recues":0.79,"mpb":1642332.0,"invites":0.9,"tat":5.59,"score":90,"score_m1":90,"anciennete":3.5,"date_renouvellement":"01/10/2024 En Retard"},{"nom":"Brahim SEKKAT","absence":0.0,"eco_donnees":2.42,"reco_recues":0.5,"mpb":1587169.0,"invites":0.9,"tat":1.98,"score":90,"score_m1":95,"anciennete":2.0,"date_renouvellement":""},{"nom":"Driss GUESSOUS (Secrétaire-Trésorier)","absence":2.0,"eco_donnees":1.46,"reco_recues":0.46,"mpb":633327.0,"invites":1.26,"tat":2.53,"score":90,"score_m1":90,"anciennete":4.9,"date_renouvellement":"01/05/2026"},{"nom":"Hanaa FOULANI","absence":1.0,"eco_donnees":2.13,"reco_recues":0.21,"mpb":270751.0,"invites":0.9,"tat":3.07,"score":90,"score_m1":90,"anciennete":5.8,"date_renouvellement":"01/03/2025 En Retard"},{"nom":"Imane AMRI","absence":2.0,"eco_donnees":2.46,"reco_recues":0.42,"mpb":1178316.0,"invites":0.72,"tat":3.07,"score":85,"score_m1":80,"anciennete":4.8,"date_renouvellement":"01/06/2026"},{"nom":"Ali ZIZI","absence":0.0,"eco_donnees":1.25,"reco_recues":4.54,"mpb":75380.0,"invites":2.53,"tat":2.89,"score":85,"score_m1":85,"anciennete":3.5,"date_renouvellement":""},{"nom":"Younes BELASRY","absence":0.0,"eco_donnees":1.0,"reco_recues":1.08,"mpb":25361.0,"invites":1.98,"tat":3.43,"score":85,"score_m1":85,"anciennete":5.4,"date_renouvellement":""},{"nom":"Meriem SAHIAOUI (Comité des Membres)","absence":0.0,"eco_donnees":0.92,"reco_recues":1.08,"mpb":442132.0,"invites":0.18,"tat":4.15,"score":80,"score_m1":85,"anciennete":4.4,"date_renouvellement":"01/05/2026"},{"nom":"Youssef HAMDOUCH","absence":1.0,"eco_donnees":2.54,"reco_recues":0.38,"mpb":332936.0,"invites":0.54,"tat":1.62,"score":80,"score_m1":85,"anciennete":1.3,"date_renouvellement":""},{"nom":"Adil LAMNINI","absence":2.0,"eco_donnees":1.33,"reco_recues":0.33,"mpb":157848.0,"invites":0.9,"tat":7.76,"score":80,"score_m1":90,"anciennete":2.0,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Safaa GHALIBE","absence":0.0,"eco_donnees":1.71,"reco_recues":3.75,"mpb":102399.0,"invites":0.54,"tat":2.17,"score":80,"score_m1":70,"anciennete":2.7,"date_renouvellement":""},{"nom":"Tareq BENSEDDIK","absence":1.0,"eco_donnees":1.06,"reco_recues":0.69,"mpb":72550.0,"invites":2.98,"tat":5.41,"score":80,"score_m1":85,"anciennete":0.3,"date_renouvellement":""},{"nom":"Abdellatif BENNANI","absence":2.0,"eco_donnees":1.04,"reco_recues":0.79,"mpb":1612650.0,"invites":0.36,"tat":3.79,"score":75,"score_m1":90,"anciennete":1.9,"date_renouvellement":"01/05/2026"},{"nom":"Mohamed BOUCHOUARI (Responsable d'accueil)","absence":2.0,"eco_donnees":1.5,"reco_recues":0.88,"mpb":905030.0,"invites":0.0,"tat":3.07,"score":75,"score_m1":75,"anciennete":1.9,"date_renouvellement":"01/05/2026"},{"nom":"MEHDI KTIRI (Comité des Membres)","absence":2.0,"eco_donnees":1.71,"reco_recues":1.83,"mpb":872162.0,"invites":0.18,"tat":3.79,"score":75,"score_m1":80,"anciennete":3.5,"date_renouvellement":""},{"nom":"Zineb BELKHAYAT (Responsable d'accueil)","absence":2.0,"eco_donnees":1.96,"reco_recues":0.71,"mpb":338325.0,"invites":0.18,"tat":2.89,"score":75,"score_m1":75,"anciennete":1.1,"date_renouvellement":""},{"nom":"Yasmine SBIOUI","absence":2.0,"eco_donnees":1.33,"reco_recues":2.83,"mpb":253850.0,"invites":0.18,"tat":3.07,"score":75,"score_m1":70,"anciennete":3.0,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Abdelaziz HABIB","absence":0.0,"eco_donnees":0.54,"reco_recues":0.25,"mpb":212278.0,"invites":1.62,"tat":1.62,"score":75,"score_m1":85,"anciennete":2.8,"date_renouvellement":""},{"nom":"Selma GUESSOUS","absence":2.0,"eco_donnees":1.54,"reco_recues":0.17,"mpb":134027.0,"invites":1.08,"tat":1.98,"score":75,"score_m1":85,"anciennete":4.8,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Salma ABARRO (Comité des Membres)","absence":0.0,"eco_donnees":0.92,"reco_recues":1.38,"mpb":33576.0,"invites":0.9,"tat":3.07,"score":75,"score_m1":80,"anciennete":4.5,"date_renouvellement":""},{"nom":"Sofia BLOT (Président)","absence":0.0,"eco_donnees":0.96,"reco_recues":1.04,"mpb":22356.0,"invites":0.9,"tat":3.61,"score":75,"score_m1":85,"anciennete":1.3,"date_renouvellement":""},{"nom":"Sahar SBAI (Coordinateur Réseaux Sociaux)","absence":0.0,"eco_donnees":0.67,"reco_recues":0.58,"mpb":5280.0,"invites":1.8,"tat":7.94,"score":75,"score_m1":75,"anciennete":0.6,"date_renouvellement":""},{"nom":"Mohamed AMMOR","absence":3.0,"eco_donnees":1.25,"reco_recues":1.13,"mpb":1835395.0,"invites":0.18,"tat":7.22,"score":70,"score_m1":75,"anciennete":1.4,"date_renouvellement":""},{"nom":"Reda BENSARI","absence":2.0,"eco_donnees":1.46,"reco_recues":4.17,"mpb":679232.0,"invites":0.0,"tat":1.98,"score":70,"score_m1":75,"anciennete":4.8,"date_renouvellement":""},{"nom":"Imane MAMANE","absence":3.0,"eco_donnees":1.38,"reco_recues":0.58,"mpb":433544.0,"invites":0.36,"tat":2.71,"score":70,"score_m1":75,"anciennete":2.0,"date_renouvellement":""},{"nom":"Kamal KANINE","absence":1.0,"eco_donnees":0.88,"reco_recues":0.79,"mpb":315750.0,"invites":0.36,"tat":1.98,"score":70,"score_m1":85,"anciennete":3.5,"date_renouvellement":"01/10/2025 En Retard"},{"nom":"Aïda BENNANI (Vice-Président)","absence":0.0,"eco_donnees":0.96,"reco_recues":0.58,"mpb":145138.0,"invites":2.35,"tat":0.9,"score":70,"score_m1":80,"anciennete":3.2,"date_renouvellement":""},{"nom":"Salah eddine MORTAQI","absence":0.0,"eco_donnees":0.58,"reco_recues":4.33,"mpb":82098.0,"invites":1.98,"tat":2.17,"score":70,"score_m1":70,"anciennete":3.1,"date_renouvellement":""},{"nom":"Soraya RHLID","absence":0.0,"eco_donnees":1.33,"reco_recues":0.88,"mpb":18880.0,"invites":0.0,"tat":5.95,"score":70,"score_m1":70,"anciennete":4.8,"date_renouvellement":"01/07/2023 En Retard"},{"nom":"Omar MOUIZINA (Coordinateur événements)","absence":2.0,"eco_donnees":1.31,"reco_recues":0.75,"mpb":4800.0,"invites":0.81,"tat":5.41,"score":70,"score_m1":65,"anciennete":0.3,"date_renouvellement":""},{"nom":"Driss AMRAOUI (Responsable d'accueil)","absence":3.0,"eco_donnees":0.74,"reco_recues":0.48,"mpb":651550.0,"invites":0.56,"tat":4.33,"score":65,"score_m1":70,"anciennete":0.5,"date_renouvellement":""},{"nom":"Wissam EL FAYAD","absence":3.0,"eco_donnees":0.92,"reco_recues":0.42,"mpb":346419.0,"invites":0.9,"tat":1.08,"score":65,"score_m1":50,"anciennete":2.5,"date_renouvellement":""},{"nom":"Imad MOUJAHID","absence":1.0,"eco_donnees":0.58,"reco_recues":1.04,"mpb":260667.0,"invites":0.18,"tat":4.51,"score":65,"score_m1":70,"anciennete":1.2,"date_renouvellement":""},{"nom":"Youssef BENNANI","absence":5.0,"eco_donnees":1.5,"reco_recues":0.54,"mpb":3895431.0,"invites":0.0,"tat":1.26,"score":60,"score_m1":70,"anciennete":5.8,"date_renouvellement":""},{"nom":"Aziza RAMZI","absence":7.0,"eco_donnees":1.17,"reco_recues":0.29,"mpb":791872.0,"invites":0.0,"tat":1.44,"score":60,"score_m1":65,"anciennete":1.7,"date_renouvellement":""},{"nom":"Hamza TAOUDI BENCHEKROUN","absence":0.0,"eco_donnees":0.33,"reco_recues":0.96,"mpb":335659.0,"invites":0.54,"tat":0.18,"score":60,"score_m1":50,"anciennete":2.5,"date_renouvellement":""},{"nom":"Anis BOUYAQINE","absence":5.0,"eco_donnees":1.5,"reco_recues":0.92,"mpb":87580.0,"invites":0.54,"tat":2.71,"score":60,"score_m1":60,"anciennete":5.8,"date_renouvellement":"01/02/2026 En Retard"},{"nom":"Abdelmounaim RAHAL","absence":0.0,"eco_donnees":0.67,"reco_recues":0.29,"mpb":20194.0,"invites":0.36,"tat":3.61,"score":60,"score_m1":65,"anciennete":2.8,"date_renouvellement":"01/06/2026"},{"nom":"Najwa BOUZOUBAA","absence":6.0,"eco_donnees":1.29,"reco_recues":0.88,"mpb":636005.0,"invites":0.18,"tat":0.72,"score":55,"score_m1":55,"anciennete":5.2,"date_renouvellement":""},{"nom":"Didier GAMBINO","absence":2.0,"eco_donnees":0.5,"reco_recues":0.88,"mpb":439230.0,"invites":0.36,"tat":1.8,"score":55,"score_m1":55,"anciennete":2.5,"date_renouvellement":""},{"nom":"Maryam LAGHRARI","absence":2.0,"eco_donnees":0.96,"reco_recues":1.38,"mpb":182155.0,"invites":0.0,"tat":1.44,"score":55,"score_m1":60,"anciennete":1.9,"date_renouvellement":"01/05/2026"},{"nom":"Eddie LEBOURG","absence":1.0,"eco_donnees":0.54,"reco_recues":0.46,"mpb":130679.0,"invites":0.0,"tat":6.5,"score":55,"score_m1":50,"anciennete":0.9,"date_renouvellement":"01/05/2026"},{"nom":"Hicham BENCHEKROUNE (Responsable d'accueil)","absence":0.0,"eco_donnees":0.79,"reco_recues":2.88,"mpb":95507.0,"invites":0.0,"tat":1.62,"score":55,"score_m1":60,"anciennete":4.8,"date_renouvellement":""},{"nom":"Houda FASLA TAHIRI","absence":3.0,"eco_donnees":2.08,"reco_recues":1.63,"mpb":87967.0,"invites":0.0,"tat":2.53,"score":55,"score_m1":60,"anciennete":2.4,"date_renouvellement":""},{"nom":"Ilham IKBAL","absence":4.0,"eco_donnees":1.29,"reco_recues":0.33,"mpb":86250.0,"invites":0.36,"tat":3.07,"score":55,"score_m1":55,"anciennete":4.3,"date_renouvellement":"01/05/2026"},{"nom":"David SEBBAG","absence":1.0,"eco_donnees":0.92,"reco_recues":1.88,"mpb":15275.0,"invites":0.0,"tat":1.98,"score":55,"score_m1":75,"anciennete":1.7,"date_renouvellement":"01/07/2026"},{"nom":"Louis CACCIUTTOLO","absence":0.0,"eco_donnees":0.17,"reco_recues":0.58,"mpb":9300.0,"invites":0.36,"tat":6.13,"score":55,"score_m1":55,"anciennete":0.6,"date_renouvellement":""},{"nom":"Nabil LARAKI","absence":0.0,"eco_donnees":0.04,"reco_recues":0.88,"mpb":0.0,"invites":0.9,"tat":1.26,"score":55,"score_m1":60,"anciennete":1.7,"date_renouvellement":"01/07/2026"},{"nom":"Omar RAIS","absence":1.0,"eco_donnees":0.5,"reco_recues":0.42,"mpb":207528.0,"invites":0.18,"tat":1.26,"score":50,"score_m1":55,"anciennete":4.1,"date_renouvellement":""},{"nom":"Mahmoud SBIOUI","absence":4.0,"eco_donnees":0.67,"reco_recues":0.67,"mpb":110990.0,"invites":0.18,"tat":2.89,"score":50,"score_m1":65,"anciennete":2.8,"date_renouvellement":"01/06/2026"},{"nom":"Karima LEBBAT","absence":3.0,"eco_donnees":1.42,"reco_recues":3.0,"mpb":97803.0,"invites":0.18,"tat":1.98,"score":50,"score_m1":60,"anciennete":4.0,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Ghita KADDAD","absence":1.0,"eco_donnees":0.5,"reco_recues":0.79,"mpb":78510.0,"invites":0.36,"tat":2.17,"score":50,"score_m1":50,"anciennete":2.8,"date_renouvellement":"01/06/2026"},{"nom":"Romain VERDAVAINNE (Responsable d'accueil)","absence":0.0,"eco_donnees":0.54,"reco_recues":0.38,"mpb":22309.0,"invites":0.18,"tat":1.8,"score":50,"score_m1":60,"anciennete":2.2,"date_renouvellement":""},{"nom":"Ahlam LAGHLID","absence":1.0,"eco_donnees":0.54,"reco_recues":0.54,"mpb":14102.0,"invites":0.36,"tat":5.23,"score":50,"score_m1":50,"anciennete":1.0,"date_renouvellement":""},{"nom":"Yacine BENYASSINE","absence":3.0,"eco_donnees":0.31,"reco_recues":0.25,"mpb":11933.0,"invites":1.89,"tat":1.89,"score":50,"score_m1":55,"anciennete":0.3,"date_renouvellement":""},{"nom":"Ghizlane DARBANE (Responsable d'accueil)","absence":2.0,"eco_donnees":0.88,"reco_recues":0.54,"mpb":4692.0,"invites":0.0,"tat":1.8,"score":50,"score_m1":55,"anciennete":2.3,"date_renouvellement":""},{"nom":"Abderrahman DIOURI","absence":2.0,"eco_donnees":0.79,"reco_recues":0.92,"mpb":55971.0,"invites":0.0,"tat":1.98,"score":45,"score_m1":45,"anciennete":2.6,"date_renouvellement":""},{"nom":"Yassir BENSAID","absence":4.0,"eco_donnees":0.75,"reco_recues":0.96,"mpb":14948.0,"invites":0.0,"tat":2.53,"score":45,"score_m1":45,"anciennete":4.2,"date_renouvellement":""},{"nom":"Hicham BENNIS","absence":1.0,"eco_donnees":0.33,"reco_recues":0.96,"mpb":7545.0,"invites":0.0,"tat":1.62,"score":45,"score_m1":45,"anciennete":2.8,"date_renouvellement":"01/06/2026"},{"nom":"Ridaa LEFRIYEKH","absence":4.0,"eco_donnees":0.44,"reco_recues":0.56,"mpb":4000.0,"invites":0.48,"tat":4.09,"score":40,"score_m1":45,"anciennete":0.3,"date_renouvellement":""},{"nom":"Mohammed DEBBAGH","absence":0.0,"eco_donnees":0.0,"reco_recues":2.0,"mpb":0.0,"invites":0.0,"tat":0.0,"score":40,"score_m1":45,"anciennete":0.1,"date_renouvellement":""},{"nom":"Younes BOUKOUMJIH","absence":2.0,"eco_donnees":0.58,"reco_recues":1.21,"mpb":123577.0,"invites":0.36,"tat":0.9,"score":35,"score_m1":40,"anciennete":3.4,"date_renouvellement":""},{"nom":"Mohamed Amine BOUKILI","absence":1.0,"eco_donnees":0.25,"reco_recues":0.17,"mpb":78330.0,"invites":0.36,"tat":0.72,"score":35,"score_m1":35,"anciennete":3.0,"date_renouvellement":""},{"nom":"Younes BERRADA","absence":2.0,"eco_donnees":0.07,"reco_recues":0.13,"mpb":2500.0,"invites":0.29,"tat":1.15,"score":35,"score_m1":30,"anciennete":0.3,"date_renouvellement":""},{"nom":"Nizar SKIREDJ","absence":3.0,"eco_donnees":0.21,"reco_recues":0.25,"mpb":59587.0,"invites":0.0,"tat":0.72,"score":25,"score_m1":30,"anciennete":1.3,"date_renouvellement":""},{"nom":"ALIDI MOHAMED YASSINE","absence":12.0,"eco_donnees":0.08,"reco_recues":0.04,"mpb":12684.0,"invites":0.18,"tat":0.36,"score":25,"score_m1":25,"anciennete":0.7,"date_renouvellement":""},{"nom":"Hamza LARAKI","absence":4.0,"eco_donnees":0.54,"reco_recues":0.38,"mpb":5200.0,"invites":0.18,"tat":0.54,"score":25,"score_m1":50,"anciennete":0.9,"date_renouvellement":"01/05/2026"},{"nom":"Oussama SEFFAR","absence":5.0,"eco_donnees":0.21,"reco_recues":0.13,"mpb":3600.0,"invites":0.0,"tat":0.54,"score":25,"score_m1":25,"anciennete":2.8,"date_renouvellement":"01/06/2026"},{"nom":"Salim BENMLIH FATH","absence":6.0,"eco_donnees":0.17,"reco_recues":0.21,"mpb":0.0,"invites":0.0,"tat":0.0,"score":25,"score_m1":25,"anciennete":1.0,"date_renouvellement":"01/04/2026 En Retard"},{"nom":"Omar RAHIM","absence":6.0,"eco_donnees":0.05,"reco_recues":0.05,"mpb":0.0,"invites":0.0,"tat":0.68,"score":25,"score_m1":25,"anciennete":0.4,"date_renouvellement":""},{"nom":"Ismail SLAOUI","absence":4.0,"eco_donnees":0.13,"reco_recues":0.13,"mpb":0.0,"invites":0.0,"tat":0.9,"score":25,"score_m1":35,"anciennete":0.7,"date_renouvellement":"01/07/2026"}]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let monthsData = {};   // { "Mois Année": [...members] }
+let currentMonth = "Mars 2026";
+let currentFilter = 'all';
+let currentMember = null;
+let engagements = [];
+let reports = [];
+
+// ============================================================
+// UTILS
+// ============================================================
+const initials = n => { const c=n.replace(/\(.*?\)/g,'').trim().split(' ').filter(p=>p.length>1); return c.length>=2?(c[0][0]+c[1][0]).toUpperCase():n.substring(0,2).toUpperCase(); };
+const cleanName = n => n.replace(/\s*\([^)]*\)/g,'').trim();
+const role = n => { const m=n.match(/\(([^)]+)\)/); return m?m[1]:''; };
+const avatarColor = n => { const cs=[['#C9A84C','#8C6A1E'],['#4A9EBF','#2B6E8A'],['#8E44AD','#5B2C6F'],['#16A085','#0E6655'],['#D35400','#922B21'],['#1ABC9C','#0E8974'],['#E67E22','#CA6F1E'],['#2980B9','#1A5276']]; let h=0; for(let c of n) h=(h*31+c.charCodeAt(0))%cs.length; return cs[Math.abs(h)%cs.length]; };
+// BNI official: <30=gray, 30-49=red, 50-69=orange, >=70=green
+const scoreClass = s => s>=70?'cbni-green':s>=50?'cbni-orange':s>=30?'cbni-red':'cbni-gray';
+const scoreBNIColor = s => s>=70?'#27AE60':s>=50?'#F39C12':s>=30?'#E53935':'#9E9E9E';
+const scoreBNILabel = s => s>=70?'🟢 Vert':s>=50?'🟡 Orange':s>=30?'🔴 Rouge':'⬜ Gris';
+const fmtMPB = v => v>=1e6?(v/1e6).toFixed(2)+' M':v>=1000?(v/1000).toFixed(0)+' K':v.toFixed(0);
+
+function getAlerts(m) {
+  const a=[],t=[];
+  if(m.absence>=3){a.push('absence');t.push(`Absence élevée (${m.absence}) — Rappeler l'obligation de présence`);}
+  if(m.eco_donnees<1.0){a.push('eco_donnees');t.push(`Éco. données faible (${m.eco_donnees.toFixed(2)}/sem) — Encourager la saisie hebdomadaire`);}
+  if(m.invites<0.5){a.push('invites');t.push(`Invités insuffisants (${m.invites.toFixed(2)}/mois) — Proposer d'inviter des contacts`);}
+  if(m.tat<1.5){a.push('tat');t.push(`TAT faible (${m.tat.toFixed(2)}/mois) — Planifier des tête-à-tête`);}
+  if(m.score_m1>0&&m.score<m.score_m1-5){a.push('score');t.push(`Score en baisse de ${m.score_m1-m.score} pts — Identifier les causes`);}
+  return {alerts:a,tips:t};
+}
+
+function getIndStatus(k,v) {
+  if(k==='absence') return v>=3?'alert':v>=1?'warn':'good';
+  if(k==='eco_donnees') return v<1.0?'alert':v<2.0?'warn':'good';
+  if(k==='invites') return v<0.5?'alert':v<1.0?'warn':'good';
+  if(k==='tat') return v<1.5?'alert':v<2.0?'warn':'good';
+  if(k==='reco_recues') return v<0.5?'alert':v<1.5?'warn':'good';
+  return 'good';
+}
+
+// Get member data in a specific month
+function getMemberInMonth(nom, month) {
+  return (monthsData[month]||[]).find(m=>m.nom===nom);
+}
+
+// Get all months sorted chronologically
+function getSortedMonths() {
+  const order = {'Janvier':1,'Février':2,'Mars':3,'Avril':4,'Mai':5,'Juin':6,'Juillet':7,'Août':8,'Septembre':9,'Octobre':10,'Novembre':11,'Décembre':12};
+  return Object.keys(monthsData).sort((a,b)=>{
+    const [mA,yA]=a.split(' '); const [mB,yB]=b.split(' ');
+    if(yA!==yB) return parseInt(yA)-parseInt(yB);
+    return (order[mA]||0)-(order[mB]||0);
+  });
+}
+
+// Score history for a member across all months
+function getScoreHistory(nom) {
+  return getSortedMonths().map(mo => {
+    const m = getMemberInMonth(nom, mo);
+    return {month:mo, score:m?m.score:null};
+  }).filter(x=>x.score!==null);
+}
+
+// ============================================================
+// MONTH BAR
+// ============================================================
+function renderMonthBar() {
+  const months = getSortedMonths();
+  document.getElementById('monthChips').innerHTML = months.map(m =>
+    `<button class="month-chip ${m===currentMonth?'active':''}" onclick="selectMonth('${m}')">${m}</button>`
+  ).join('');
+}
+
+function selectMonth(m) {
+  currentMonth = m;
+  renderMonthBar();
+  filterMembers();
+  renderDashboard();
+  document.getElementById('dashMonthLabel').textContent = m;
+}
+
+// ============================================================
+// RENDER MEMBERS
+// ============================================================
+function renderMembers(list) {
+  const el = document.getElementById('membersList');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Aucun résultat</div><div class="empty-sub">Modifiez votre recherche ou filtre</div></div>`;
+    return;
+  }
+  el.innerHTML = list.map(m => {
+    const [c1,c2]=avatarColor(m.nom);
+    const diff=m.score-m.score_m1;
+    const tc=diff>0?'tup':diff<0?'tdown':'tflat';
+    const ti=diff>0?'▲':diff<0?'▼':'—';
+    const ts=diff!==0?(diff>0?'+':'')+diff:'';
+    const r=role(m.nom);
+    const {alerts}=getAlerts(m);
+    const isLate=m.date_renouvellement.includes('En Retard');
+    return `<div class="member-card" onclick="openMember('${m.nom.replace(/'/g,"\\'")}')">
+      <div class="m-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${initials(m.nom)}</div>
+      <div class="m-info">
+        <div class="m-name">${cleanName(m.nom)}</div>
+        <div class="m-sub">${r||'Membre'}</div>
+        ${alerts.length?`<div class="m-alert">⚠ ${alerts.length} alerte${alerts.length>1?'s':''}</div>`:''}
+        ${isLate?`<span class="ren-late" style="margin-top:2px;display:inline-flex">🔄 Retard renouvellement</span>`:''}
+      </div>
+      <div class="m-score">
+        <div class="s-num ${scoreClass(m.score)}">${m.score}</div>
+        <div class="s-trend ${tc}">${ti} ${ts}</div>
+        <div style="font-size:10px;color:${scoreBNIColor(m.score)};font-weight:600;margin-top:2px;">${scoreBNILabel(m.score)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterMembers() {
+  const members = monthsData[currentMonth]||[];
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = [...members];
+  if(currentFilter==='alert') list=list.filter(m=>getAlerts(m).alerts.length>0);
+  else if(currentFilter==='decline') list=list.filter(m=>m.score<m.score_m1);
+  else if(currentFilter==='renewal') list=list.filter(m=>m.date_renouvellement.includes('En Retard'));
+  else if(currentFilter==='top') list=list.filter(m=>m.score>=70);
+  if(q) list=list.filter(m=>m.nom.toLowerCase().includes(q));
+  renderMembers(list);
+}
+
+function setFilter(f,btn) {
+  currentFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  filterMembers();
+}
+
+// ============================================================
+// MEMBER MODAL
+// ============================================================
+const INDS = [
+  {key:'absence',icon:'🪑',name:'Absences / mois',hint:'Max: 0-2'},
+  {key:'eco_donnees',icon:'📊',name:'Éco. Données / sem',hint:'Objectif: ≥2'},
+  {key:'reco_recues',icon:'🤝',name:'Recos. Reçues / sem',hint:'Objectif: ≥2'},
+  {key:'mpb',icon:'💰',name:'MPB (6 mois)',hint:'Affaires générées'},
+  {key:'invites',icon:'👤',name:'Invités / mois',hint:'Objectif: ≥1'},
+  {key:'tat',icon:'☕',name:'Tête-à-tête / mois',hint:'Objectif: ≥2'},
+];
+
+function openMember(nom) {
+  const m = getMemberInMonth(nom, currentMonth);
+  if(!m){showToast('Membre introuvable pour ce mois','err');return;}
+  currentMember = m;
+  const [c1,c2]=avatarColor(m.nom);
+  const r=role(m.nom);
+  const diff=m.score-m.score_m1;
+  const {alerts,tips}=getAlerts(m);
+  const isLate=m.date_renouvellement.includes('En Retard');
+  const history=getScoreHistory(nom);
+  const months=getSortedMonths();
+
+  document.getElementById('modalHdr').innerHTML=`
+    <div class="modal-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${initials(m.nom)}</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;">${cleanName(m.nom)}</div>
+      <div style="font-size:12px;color:var(--gold);">${r||'Membre'} · ${m.anciennete.toFixed(1)} an${m.anciennete>=2?'s':''}</div>
+      ${isLate?`<span class="ren-late" style="margin-top:3px;display:inline-flex">🔄 Renouvellement en retard</span>`:
+        m.date_renouvellement?`<span class="ren-ok" style="margin-top:3px;display:inline-flex">🗓 ${m.date_renouvellement}</span>`:''}
+    </div>
+    <button class="modal-close" onclick="closeMemberModal()">✕</button>`;
+
+  // Score evolution mini chart (multi-month)
+  let evoHTML='';
+  if(history.length>=2){
+    const maxS=Math.max(...history.map(h=>h.score),100);
+    evoHTML=`<div style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text);margin-bottom:6px;">📈 Évolution du score</div>
+      <div class="evo-chart">${history.map(h=>{
+        const pct=Math.round((h.score/maxS)*100);
+        const col=h.score>=80?'var(--green)':h.score>=60?'var(--orange)':'var(--red)';
+        return `<div title="${h.month}: ${h.score}" style="flex:1;background:${col};height:${pct}%;border-radius:3px 3px 0 0;min-height:4px;opacity:0.85;"></div>`;
+      }).join('')}</div>
+      <div class="evo-labels">${history.map(h=>`<div style="flex:1;font-size:9px;color:var(--text);text-align:center;opacity:.7;">${h.month.split(' ')[0].substring(0,3)}<br><b style="color:${h.score>=80?'var(--green)':h.score>=60?'var(--orange)':'var(--red)'}">${h.score}</b></div>`).join('')}</div>
+    </div>`;
+  }
+
+  const tc=diff>0?'tup':diff<0?'tdown':'tflat';
+  const ti=diff>0?'▲':diff<0?'▼':'→';
+  const ts=diff>0?`+${diff}`:`${diff}`;
+
+  const alertHTML=tips.length?`<div class="alert-box"><div class="ab-title">⚠️ Points à adresser</div>${tips.map(t=>`<div class="ab-item">${t}</div>`).join('')}</div>`:'';
+
+  // Compare with previous month
+  const sortedM=getSortedMonths();
+  const curIdx=sortedM.indexOf(currentMonth);
+  let prevCompHTML='';
+  if(curIdx>0){
+    const prevMonth=sortedM[curIdx-1];
+    const prev=getMemberInMonth(nom,prevMonth);
+    if(prev){
+      prevCompHTML=`<div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;">
+        <span style="color:var(--gold);font-weight:600;">Vs ${prevMonth}: </span>
+        ${INDS.filter(i=>i.key!=='mpb').map(i=>{
+          const cur=m[i.key],prv=prev[i.key];
+          const d=cur-prv;
+          const sign=d>0?'+':'';
+          const col=d>0?(i.key==='absence'?'var(--red)':'var(--green)'):(d<0?(i.key==='absence'?'var(--green)':'var(--red)'):'var(--text)');
+          return d!==0?`<span style="color:${col};margin-right:8px;">${i.icon}${sign}${d.toFixed(2)}</span>`:'';
+        }).filter(Boolean).join('')||'<span style="color:var(--text);">Pas de changement notable</span>'}
+      </div>`;
+    }
+  }
+
+  const lastReport=reports.filter(r=>r.memberNom===m.nom).slice(-1)[0];
+  const lastRptHTML=lastReport?`<div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;">
+    <div style="font-size:11px;color:var(--gold);font-weight:600;margin-bottom:5px;">📋 Dernier entretien: ${lastReport.date}</div>
+    ${lastReport.engagements.length?lastReport.engagements.map(e=>`<div style="font-size:12px;color:var(--text);padding:2px 0;">✅ ${e}</div>`).join(''):''}
+  </div>`:'';
+
+  const indsHTML=INDS.map(ind=>{
+    const v=m[ind.key];
+    const st=getIndStatus(ind.key,v);
+    const cls=st==='alert'?'alert':st==='warn'?'warn':'';
+    const bc=st==='alert'?'b-alert':st==='warn'?'b-warn':'b-ok';
+    const bt=st==='alert'?'⚠ Alerte':st==='warn'?'〜 Attention':'✓ OK';
+    const vc=st==='alert'?'var(--red)':st==='warn'?'var(--orange)':'var(--green)';
+    const fmt=ind.key==='mpb'?fmtMPB(v)+' MAD':v.toFixed(ind.key==='absence'?0:2);
+    const sortedMonths=getSortedMonths();
+    const prevMo=curIdx>0?sortedM[curIdx-1]:null;
+    const prevM=prevMo?getMemberInMonth(nom,prevMo):null;
+    const prevVal=prevM?prevM[ind.key]:null;
+    const prevStr=prevVal!==null?`<div class="ind-prev">M-1: ${ind.key==='mpb'?fmtMPB(prevVal):prevVal.toFixed(ind.key==='absence'?0:2)}</div>`:'';
+    return `<div class="ind-row ${cls}">
+      <div class="ind-icon">${ind.icon}</div>
+      <div class="ind-info">
+        <div class="ind-name">${ind.name}</div>
+        <div class="ind-val" style="color:${vc}">${fmt}</div>
+        ${prevStr}
+        <div style="font-size:10px;color:var(--text);opacity:.7;">${ind.hint}</div>
+      </div>
+      <div class="ind-badge ${bc}">${bt}</div>
+    </div>`;
+  }).join('');
+
+  const memberReports=reports.filter(r=>r.memberNom===m.nom);
+  document.getElementById('modalBody').innerHTML=`
+    ${evoHTML}
+    <div class="score-banner">
+      <div class="score-big ${scoreClass(m.score)}">${m.score}</div>
+      <div class="score-info">
+        <div class="score-label">Score ${currentMonth}</div>
+        <div class="score-evol ${tc}">${ti} ${ts} pts <span style="font-size:13px;color:var(--text);font-weight:400;">vs M-1 (${m.score_m1})</span></div>
+      </div>
+    </div>
+    ${prevCompHTML}
+    ${alertHTML}
+    ${lastRptHTML}
+    <div class="ind-title">📈 Indicateurs</div>
+    <div class="ind-grid">${indsHTML}</div>
+    <button class="btn-entretien" onclick="openForm('${m.nom.replace(/'/g,"\\'")}')">✍️ Saisir un entretien</button>
+    <button class="btn-secondary" onclick="showMemberHistory('${m.nom.replace(/'/g,"\\'")}')">📋 Historique entretiens (${memberReports.length})</button>
+  `;
+  document.getElementById('memberModal').classList.add('open');
+}
+
+function closeMemberModal(e) {
+  if(e&&e.target!==document.getElementById('memberModal'))return;
+  document.getElementById('memberModal').classList.remove('open');
+}
+
+// ============================================================
+// FORM
+// ============================================================
+const INDS_FORM=[
+  {key:'absence',label:'🪑 Absences'},{key:'eco_donnees',label:'📊 Éco. Données'},
+  {key:'reco_recues',label:'🤝 Recos. Reçues'},{key:'mpb',label:'💰 MPB'},
+  {key:'invites',label:'👤 Invités'},{key:'tat',label:'☕ Tête-à-tête'},
+  {key:'score',label:'⭐ Score global'},{key:'objectifs',label:'🎯 Objectifs BNI'},
+];
+
+function openForm(nom) {
+  currentMember=getMemberInMonth(nom,currentMonth);
+  engagements=[];
+  document.getElementById('formMemberName').textContent=cleanName(nom);
+  document.getElementById('entDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('entLieu').value='';
+  document.getElementById('entNotes').value='';
+  document.getElementById('entProgres').value='';
+  document.getElementById('entNextDate').value='';
+  document.getElementById('engInputRow').style.display='none';
+  document.getElementById('engInput').value='';
+  const {alerts}=currentMember?getAlerts(currentMember):{alerts:[]};
+  document.getElementById('indicatorsChecks').innerHTML=INDS_FORM.map(ind=>{
+    const pre=alerts.includes(ind.key)?'checked':'';
+    return `<label class="cb-item ${pre}" onclick="toggleCheck(this)">
+      <input type="checkbox" ${pre?'checked':''} value="${ind.key}">
+      <div class="cb-check"></div><div class="cb-label">${ind.label}</div>
+    </label>`;
+  }).join('');
+  renderEngs();
+  document.getElementById('memberModal').classList.remove('open');
+  document.getElementById('formPage').classList.add('open');
+  document.getElementById('formPage').scrollTop=0;
+}
+
+function closeForm(){document.getElementById('formPage').classList.remove('open');if(currentMember)openMember(currentMember.nom);}
+function toggleCheck(el){el.classList.toggle('checked');el.querySelector('input').checked=el.classList.contains('checked');}
+function showEngInput(){document.getElementById('engInputRow').style.display='flex';document.getElementById('engInput').focus();}
+function addEngagement(){const v=document.getElementById('engInput').value.trim();if(!v)return;engagements.push(v);document.getElementById('engInput').value='';document.getElementById('engInputRow').style.display='none';renderEngs();}
+function renderEngs(){document.getElementById('engagementList').innerHTML=engagements.map((e,i)=>`<div class="eng-item"><button class="eng-del" onclick="rmEng(${i})">✕</button><div class="eng-text">${e}</div></div>`).join('');}
+function rmEng(i){engagements.splice(i,1);renderEngs();}
+
+function saveEntretien(){
+  if(!currentMember)return;
+  const checked=[...document.querySelectorAll('#indicatorsChecks .cb-item.checked input')].map(el=>el.value);
+  const r={id:Date.now(),memberNom:currentMember.nom,date:document.getElementById('entDate').value||new Date().toISOString().split('T')[0],lieu:document.getElementById('entLieu').value,indicateurs:checked,notes:document.getElementById('entNotes').value,engagements:[...engagements],progres:document.getElementById('entProgres').value,nextDate:document.getElementById('entNextDate').value,scoreMoment:currentMember.score,month:currentMonth};
+  reports.push(r);
+  saveToStorage();
+  showToast('✅ Entretien enregistré !');
+  document.getElementById('formPage').classList.remove('open');
+  renderHistory();
+  renderDashboard();
+  setTimeout(()=>openMember(currentMember.nom),300);
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function renderHistory(){
+  const el=document.getElementById('histList');
+  const q=document.getElementById('histSearch').value.toLowerCase();
+  let list=[...reports].reverse();
+  if(q)list=list.filter(r=>r.memberNom.toLowerCase().includes(q)||r.notes.toLowerCase().includes(q));
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Aucun entretien</div><div class="empty-sub">Sélectionnez un membre et créez votre premier entretien.</div></div>`;return;}
+  el.innerHTML=list.map(r=>{
+    const m=getMemberInMonth(r.memberNom,r.month)||getMemberInMonth(r.memberNom,currentMonth);
+    const [c1,c2]=avatarColor(r.memberNom);
+    const tags=(r.indicateurs||[]).map(k=>{const ind=INDS_FORM.find(i=>i.key===k);return ind?`<span class="rpt-tag">${ind.label}</span>`:''}).join('');
+    return `<div class="rpt-card" onclick="openRptDetail(${r.id})">
+      <div class="rpt-hdr">
+        <div class="rpt-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${initials(r.memberNom)}</div>
+        <div><div class="rpt-name">${cleanName(r.memberNom)}</div><div class="rpt-date">📅 ${r.date} · ${r.lieu||'—'} · Score: ${r.scoreMoment}</div></div>
+      </div>
+      ${tags?`<div class="rpt-tags">${tags}</div>`:''}
+      ${r.engagements&&r.engagements.length?`<div class="rpt-engs">${r.engagements.slice(0,2).map(e=>`<div class="rpt-eng">${e}</div>`).join('')}${r.engagements.length>2?`<div style="font-size:11px;color:var(--gold);margin-top:3px;">+${r.engagements.length-2} autre(s)</div>`:''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function filterHistory(){renderHistory();}
+
+function openRptDetail(id){
+  const r=reports.find(x=>x.id===id);
+  if(!r)return;
+  const pm={oui:'✅ Amélioration nette',partiel:'🟡 Partielle',non:'❌ Pas de changement',premier:'🆕 Premier entretien'};
+  document.getElementById('rptDetailMember').textContent=cleanName(r.memberNom);
+  document.getElementById('rptDetailBody').innerHTML=`
+    <div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:12px;">
+      <div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">Informations</div>
+      <div style="font-size:13px;margin-bottom:3px;">📅 ${r.date}</div>
+      <div style="font-size:13px;margin-bottom:3px;">📍 ${r.lieu||'Non précisé'}</div>
+      <div style="font-size:13px;margin-bottom:3px;">📆 Mois: ${r.month}</div>
+      <div style="font-size:13px;">⭐ Score: ${r.scoreMoment}/100</div>
+    </div>
+    ${r.indicateurs&&r.indicateurs.length?`<div style="margin-bottom:12px;"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--gold);margin-bottom:7px;">📌 Indicateurs</div><div style="display:flex;flex-wrap:wrap;gap:5px;">${r.indicateurs.map(k=>{const i=INDS_FORM.find(x=>x.key===k);return i?`<span class="rpt-tag">${i.label}</span>`:''}).join('')}</div></div>`:''}
+    ${r.notes?`<div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:12px;"><div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">💬 Notes</div><div style="font-size:13px;color:var(--text);line-height:1.6;">${r.notes}</div></div>`:''}
+    ${r.engagements&&r.engagements.length?`<div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:12px;"><div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">✅ Engagements</div>${r.engagements.map(e=>`<div style="font-size:13px;color:var(--text);padding:5px 0;border-bottom:1px solid rgba(201,168,76,.08);display:flex;gap:7px;"><span>✅</span><span>${e}</span></div>`).join('')}</div>`:''}
+    ${r.progres?`<div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:12px;"><div style="font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">🎯 Progression</div><div style="font-size:13px;">${pm[r.progres]||r.progres}</div>${r.nextDate?`<div style="font-size:12px;color:var(--text);margin-top:5px;">🗓 Prochain: ${r.nextDate}</div>`:''}</div>`:''}
+    <button onclick="if(confirm('Supprimer ?')){deleteReport(${r.id})}" style="width:100%;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.2);border-radius:var(--radius-sm);padding:11px;color:var(--red);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;margin-top:7px;">🗑 Supprimer</button>
+  `;
+  document.getElementById('rptDetail').classList.add('open');
+}
+function closeRptDetail(){document.getElementById('rptDetail').classList.remove('open');}
+function deleteReport(id){reports=reports.filter(r=>r.id!==id);saveToStorage();closeRptDetail();renderHistory();renderDashboard();showToast('🗑 Supprimé');}
+function showMemberHistory(nom){closeMemberModal();showPage('historique');document.getElementById('histSearch').value=cleanName(nom);filterHistory();}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(){
+  const members=monthsData[currentMonth]||[];
+  if(!members.length){document.getElementById('dashStats').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--text);padding:20px;">Aucune donnée pour ce mois</div>';return;}
+  const avg=Math.round(members.reduce((s,m)=>s+m.score,0)/members.length);
+  const alertC=members.filter(m=>getAlerts(m).alerts.length>0).length;
+  const decC=members.filter(m=>m.score<m.score_m1).length;
+  const renC=members.filter(m=>m.date_renouvellement.includes('En Retard')).length;
+  document.getElementById('dashMonthLabel').textContent=currentMonth;
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card"><div class="stat-val">${members.length}</div><div class="stat-lbl">👥 Membres</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--gold)">${avg}</div><div class="stat-lbl">📊 Score moyen</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--red)">${alertC}</div><div class="stat-lbl">⚠️ En alerte</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--orange)">${decC}</div><div class="stat-lbl">📉 En baisse</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--red)">${renC}</div><div class="stat-lbl">🔄 Retards</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${reports.length}</div><div class="stat-lbl">📋 Entretiens</div></div>`;
+  const urgent=members.filter(m=>m.score<70||getAlerts(m).alerts.length>=2).sort((a,b)=>a.score-b.score).slice(0,8);
+  document.getElementById('dashAlerts').innerHTML=urgent.map(m=>{
+    const [c1,c2]=avatarColor(m.nom);const diff=m.score-m.score_m1;
+    return `<div class="member-card" onclick="openMember('${m.nom.replace(/'/g,"\\'")}')">
+      <div class="m-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${initials(m.nom)}</div>
+      <div class="m-info"><div class="m-name">${cleanName(m.nom)}</div><div class="m-sub">${getAlerts(m).alerts.length} alerte(s)</div></div>
+      <div class="s-num ${scoreClass(m.score)}" style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;">${m.score}</div>
+    </div>`;
+  }).join('');
+  const brackets=[{l:'🟢 ≥70',min:70,max:100,col:'#27AE60'},{l:'🟡 50-69',min:50,max:69,col:'#F39C12'},{l:'🔴 30-49',min:30,max:49,col:'#E53935'},{l:'⬜ <30',min:0,max:29,col:'#9E9E9E'}];
+  const mc=Math.max(1,...brackets.map(b=>members.filter(m=>m.score>=b.min&&m.score<=b.max).length));
+  document.getElementById('dashDistrib').innerHTML=brackets.map(b=>{
+    const cnt=members.filter(m=>m.score>=b.min&&m.score<=b.max).length;
+    const pct=Math.round((cnt/mc)*100);
+    const pctTotal=Math.round((cnt/members.length)*100);
+    return `<div class="bar-row"><div class="bar-lbl" style="font-size:11px;">${b.l}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${b.col};"></div></div><div style="font-size:12px;color:var(--text);min-width:50px;text-align:right;">${cnt} (${pctTotal}%)</div></div>`;
+  }).join('');
+  const top10=[...members].sort((a,b)=>b.score-a.score).slice(0,10);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('dashTop10').innerHTML=top10.map((m,i)=>{
+    const [c1,c2]=avatarColor(m.nom);
+    return `<div class="member-card" onclick="openMember('${m.nom.replace(/'/g,"\\'")}')">
+      <div style="font-size:17px;width:26px;text-align:center;">${medals[i]||i+1}</div>
+      <div class="m-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${initials(m.nom)}</div>
+      <div class="m-info"><div class="m-name">${cleanName(m.nom)}</div></div>
+      <div class="s-num ${scoreClass(m.score)}" style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;">${m.score}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// EVOLUTION CHART
+// ============================================================
+const BNI_ZONES = [
+  {key:'green', label:'Vert ≥70',   min:70, max:100, col:'#27AE60', stroke:'#2ECC71'},
+  {key:'orange',label:'Orange 50-69',min:50,max:69,  col:'#F39C12', stroke:'#F5B942'},
+  {key:'red',   label:'Rouge 30-49', min:30, max:49,  col:'#E53935', stroke:'#FF6B6B'},
+  {key:'gray',  label:'Gris <30',    min:0,  max:29,  col:'#9E9E9E', stroke:'#BDBDBD'},
+];
+
+function getZoneCounts(members) {
+  const total = members.length || 1;
+  return BNI_ZONES.map(z => ({
+    ...z,
+    count: members.filter(m => m.score >= z.min && m.score <= z.max).length,
+    pct: Math.round(members.filter(m => m.score >= z.min && m.score <= z.max).length / total * 100)
+  }));
+}
+
+function drawLineChart(svgId, labelsId, months, series, yLabel, yMax, yMin=0) {
+  const svg = document.getElementById(svgId);
+  const labelsEl = document.getElementById(labelsId);
+  if (!svg || months.length < 1) return;
+
+  const W=340, H=200, pad={top:20,right:15,bottom:10,left:32};
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+  const n = months.length;
+
+  const xPos = i => pad.left + (n <= 1 ? cW/2 : i * cW / (n-1));
+  const yPos = v => pad.top + cH - ((v - yMin) / (yMax - yMin)) * cH;
+
+  let html = '';
+
+  // Grid lines
+  const yTicks = 4;
+  for (let i=0; i<=yTicks; i++) {
+    const v = yMin + (yMax-yMin)*i/yTicks;
+    const y = yPos(v);
+    html += `<line x1="${pad.left}" y1="${y}" x2="${W-pad.right}" y2="${y}" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>`;
+    html += `<text x="${pad.left-4}" y="${y+4}" text-anchor="end" font-size="9" fill="#888">${Math.round(v)}</text>`;
+  }
+
+  // Lines + dots
+  series.forEach(s => {
+    if (!s.data.some(v=>v!==null)) return;
+    // Line path
+    let d = '';
+    s.data.forEach((v, i) => {
+      if (v === null) return;
+      const x = xPos(i), y = yPos(v);
+      d += (d===''?'M':'L') + `${x},${y}`;
+    });
+    html += `<path d="${d}" fill="none" stroke="${s.stroke}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>`;
+
+    // Dots + values
+    s.data.forEach((v, i) => {
+      if (v === null) return;
+      const x = xPos(i), y = yPos(v);
+      html += `<circle cx="${x}" cy="${y}" r="4" fill="${s.col}" stroke="#1A2B3C" stroke-width="1.5"/>`;
+      html += `<text x="${x}" y="${y-8}" text-anchor="middle" font-size="10" font-weight="700" fill="${s.stroke}">${v}</text>`;
+    });
+  });
+
+  svg.innerHTML = html;
+
+  // X labels (months abbreviated)
+  labelsEl.innerHTML = months.map(m => {
+    const parts = m.split(' ');
+    return `<div style="flex:1;text-align:center;font-size:10px;color:#888;">${parts[0].substring(0,3)}<br><span style="color:var(--gold);font-size:9px;">${parts[1]||''}</span></div>`;
+  }).join('');
+}
+
+function renderEvolution() {
+  const months = getSortedMonths();
+  if (months.length === 0) {
+    ['evoChartSVG','evoPctSVG','evoAvgSVG'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = `<text x="170" y="100" text-anchor="middle" fill="#888" font-size="13">Aucune donnée</text>`;
+    });
+    return;
+  }
+
+  // Build series data
+  const countSeries = BNI_ZONES.map(z => ({
+    ...z,
+    data: months.map(mo => {
+      const mbs = monthsData[mo] || [];
+      return mbs.filter(m => m.score >= z.min && m.score <= z.max).length;
+    })
+  }));
+
+  const pctSeries = BNI_ZONES.map(z => ({
+    ...z,
+    data: months.map(mo => {
+      const mbs = monthsData[mo] || [];
+      if (!mbs.length) return null;
+      return Math.round(mbs.filter(m => m.score >= z.min && m.score <= z.max).length / mbs.length * 100);
+    })
+  }));
+
+  const avgSeries = [{
+    col: '#C9A84C', stroke: '#F0D285', label: 'Score moyen',
+    data: months.map(mo => {
+      const mbs = monthsData[mo] || [];
+      if (!mbs.length) return null;
+      return Math.round(mbs.reduce((s,m)=>s+m.score,0)/mbs.length);
+    })
+  }];
+
+  // Max values for y axis
+  const maxCount = Math.max(10, ...countSeries.flatMap(s=>s.data));
+  const maxPct = 100;
+  const allAvg = avgSeries[0].data.filter(v=>v!==null);
+  const maxAvg = Math.max(100, ...allAvg);
+  const minAvg = Math.max(0, Math.min(...allAvg) - 10);
+
+  drawLineChart('evoChartSVG','evoChartXLabels', months, countSeries, 'Membres', maxCount);
+  drawLineChart('evoPctSVG','evoPctXLabels', months, pctSeries, '%', 100);
+  drawLineChart('evoAvgSVG','evoAvgXLabels', months, avgSeries, 'Score', maxAvg, minAvg);
+
+  // Detail table
+  const tableHTML = months.map(mo => {
+    const mbs = monthsData[mo] || [];
+    const total = mbs.length || 1;
+    const zones = getZoneCounts(mbs);
+    const avg = mbs.length ? Math.round(mbs.reduce((s,m)=>s+m.score,0)/mbs.length) : '-';
+    return `<div style="background:var(--surface);border:1px solid rgba(201,168,76,.1);border-radius:var(--radius);padding:13px;margin-bottom:10px;">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--gold);margin-bottom:10px;">📅 ${mo} <span style="font-weight:400;font-size:12px;color:var(--text);">(${mbs.length} membres · moy. ${avg})</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${zones.map(z=>`<div style="background:rgba(0,0,0,.2);border-radius:10px;padding:10px;border-left:3px solid ${z.col};">
+          <div style="font-size:11px;color:${z.col};font-weight:600;margin-bottom:4px;">${z.label}</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:${z.col};">${z.count}</div>
+          <div style="font-size:11px;color:var(--text);">${z.pct}% du chapter</div>
+        </div>`).join('')}
+      </div>
+      <!-- Mini stacked bar -->
+      <div style="margin-top:10px;height:10px;border-radius:5px;overflow:hidden;display:flex;">
+        ${zones.map(z=>z.count?`<div style="flex:${z.count};background:${z.col};"></div>`:'').join('')}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('evoTable').innerHTML = tableHTML;
+}
+
+// ============================================================
+// FILE IMPORT
+// ============================================================
+document.getElementById('fileInput').addEventListener('change',function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const data=XLSX.utils.sheet_to_json(ws,{header:1});
+      // Detect month from filename
+      const fn=file.name.toLowerCase();
+      const months_fr=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      let detectedMonth='';
+      for(const mo of months_fr){if(fn.includes(mo)){const yr=fn.match(/20\d\d/);detectedMonth=mo.charAt(0).toUpperCase()+mo.slice(1)+(yr?' '+yr[0]:'');break;}}
+      if(!detectedMonth) detectedMonth='Mois '+Object.keys(monthsData).length;
+
+      let header=null,newMembers=[];
+      for(const row of data){
+        const rowStr=row.map(c=>String(c||''));
+        if(rowStr.some(c=>c.includes('Membre'))&&rowStr.some(c=>c.includes('Score'))){
+          header=rowStr.map(c=>c.replace(/\n/g,' ').trim().toLowerCase());continue;
+        }
+        if(!header)continue;
+        const nom=row[0]?String(row[0]).trim():'';
+        if(!nom||nom.toLowerCase().includes('totaux')||nom.toLowerCase().includes('moyenne'))continue;
+        const idx=k=>header.findIndex(h=>h.includes(k));
+        const g=k=>{const i=idx(k);return i>=0?row[i]:null;};
+        const n=v=>{if(v==null||v==='')return 0;const f=parseFloat(String(v).replace(',','.'));return isNaN(f)?0:f;};
+        newMembers.push({nom,absence:n(g('absence')),eco_donnees:n(g('données')),reco_recues:n(g('reçues')||g('recues')),mpb:n(g('mpb')),invites:n(g('invités')||g('invites')),tat:n(g('tat')||g('tête')),score:Math.round(n(g('score'))),score_m1:Math.round(n(row[idx('score')+1])),anciennete:n(g('anciennet')),date_renouvellement:String(g('renouvellement')||'').replace(/\n/g,' ')});
+      }
+      if(newMembers.length>5){
+        monthsData[detectedMonth]=newMembers;
+        currentMonth=detectedMonth;
+        renderMonthBar();filterMembers();renderDashboard();
+        showToast(`✅ ${newMembers.length} membres — ${detectedMonth}`);
+      } else showToast('⚠️ Format non reconnu','err');
+    }catch(err){showToast('❌ Erreur import','err');console.error(err);}
+  };
+  reader.readAsArrayBuffer(file);e.target.value='';
+});
+
+// ============================================================
+// NAV + STORAGE
+// ============================================================
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='historique')renderHistory();
+  if(id==='dashboard')renderDashboard();
+  if(id==='evolution')renderEvolution();
+}
+
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(type?' '+type:'');
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function saveToStorage(){try{localStorage.setItem('bni_reports',JSON.stringify(reports));localStorage.setItem('bni_extra_months',JSON.stringify(Object.fromEntries(Object.entries(monthsData).filter(([k])=>!BUILTIN_MONTHS[k]))));}catch(e){}}
+function loadFromStorage(){
+  try{const r=localStorage.getItem('bni_reports');if(r)reports=JSON.parse(r);}catch(e){}
+  try{const em=localStorage.getItem('bni_extra_months');if(em){const extra=JSON.parse(em);Object.assign(monthsData,extra);}}catch(e){}
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function initApp() {
+  Object.assign(monthsData, BUILTIN_MONTHS);
+  loadFromStorage();
+  renderMonthBar();
+  filterMembers();
+  renderDashboard();
+  document.getElementById('dashMonthLabel').textContent=currentMonth;
+  document.getElementById('entDate').value=new Date().toISOString().split('T')[0];
+}
+
+// Start: check if already authenticated
+checkAuth();
+</script>
+</body>
+</html>
